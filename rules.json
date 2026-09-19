@@ -1,0 +1,163 @@
+{
+  "_comment": "Sva pravila za ocenu oglasa. Regexi su case-insensitive i rade nad tekstom bez dijakritika (š→s, č/ć→c, ž→z, đ→dj), pa se i ovde pišu bez kvačica. `title` pravila gledaju samo naslov, ostala naslov + opis.",
+
+  "thresholds": { "excellent": 90, "good": 70, "possible": 50 },
+
+  "categories": [
+    { "id": "customer-support", "label": "Korisnička podrška", "weight": 25,
+      "patterns": [
+        "customer (support|service|care|experience|operations|success)", "client (support|service|care)",
+        "\\b(support|helpdesk|help desk) (agent|associate|assistant|specialist|representative|rep|advisor|executive|officer)\\b",
+        "\\binbound (support|agent|calls)\\b", "contact cent(er|re)", "call cent(er|re|ar)\\b", "\\bcall centar", "kontakt centr", "pozivn\\w* centr",
+        "korisnick\\w* (podrsk|servis|iskustv)", "podrsk\\w* korisnic", "operater\\w* (u )?(korisnick|kontakt|call|pozivn)", "agent\\w* (u )?(korisnick|kontakt|call|pozivn)",
+        "predstavnik\\w* korisnick", "savetnik\\w* (za )?korisni", "referent\\w* (za )?(korisnick|reklamacij)", "sluzb\\w* za korisnik", "korisnicka sluzba"
+      ] },
+    { "id": "chat-email", "label": "Chat / Email podrška", "weight": 20,
+      "patterns": [
+        "\\b(chat|email|e-mail|messaging|non[- ]?voice|live chat|ticket|online) support", "chat (agent|specialist|operator|representative)", "customer (service|support) chat",
+        "podrsk\\w* (putem |preko )?(chat|mejl|email|e-mail)", "chat operat", "pisan\\w* komunikacij", "email (agent|operator|support)", "odgovaranj\\w* na (mejl|email|poruk|upit)"
+      ] },
+    { "id": "real-estate", "label": "Nekretnine", "weight": 25,
+      "patterns": [
+        "real[- ]?estate", "property (management|manager|assistant|coordinator|administrator|admin)", "(leasing|listing|rental|tenant|transaction) (assistant|coordinator|agent|administrator|specialist)",
+        "nekretnin", "izdavanj\\w* (stanov|nekretnin|apartman)", "upravljanj\\w* nekretnin", "agencij\\w* za nekretnine"
+      ] },
+    { "id": "booking", "label": "Booking / Airbnb", "weight": 25,
+      "patterns": [
+        "airbnb", "booking(\\.com)? (assistant|agent|coordinator|support|specialist)", "reservation", "rezervacij", "guest (support|relations|experience|service|communication|coordinator)",
+        "vacation rental", "short[- ]term rental", "hospitality (assistant|support|coordinator)", "gost\\w* (podrsk|komunikacij)", "recepci", "front desk"
+      ] },
+    { "id": "admin-va", "label": "Administracija / VA", "weight": 25,
+      "patterns": [
+        "virtual assistant", "virtuelni asistent", "(administrative|admin|office|executive|personal|remote|business|operations|back[- ]?office|business support|team) (assistant|support|clerk|administrator|coordinator)",
+        "administrativn", "administracij", "poslovn\\w* (asistent|sekretar)", "asistent\\w* (direktor|menadzer|uprav|rukovod|tim)", "\\bsekretar", "back office", "kancelarijsk\\w* (poslov|rad|asistent)",
+        "\\breferent\\b", "operativn\\w* asistent", "\\bassistant\\b", "\\basistent"
+      ] },
+    { "id": "ecommerce", "label": "E-commerce / Web shop", "weight": 25,
+      "patterns": [
+        "e-?commerce", "web ?shop", "online (shop|store|prodaj|prodavnic)", "internet (prodaj|prodavnic)", "marketplace", "shopify", "amazon (seller|store|va|assistant|fba)", "\\betsy\\b", "\\bebay\\b", "woocommerce"
+      ] },
+    { "id": "orders", "label": "Porudžbine / prodajna administracija", "weight": 20,
+      "patterns": [
+        "order (processing|entry|management|support|fulfil|desk)", "sales (administrat|support|assistant|coordinator|operations|associate)", "commercial assistant",
+        "porudzbin", "narudzbin", "administracij\\w* prodaj", "podrsk\\w* prodaj", "asistent\\w* (u |za )?prodaj", "komercijaln\\w* (asistent|referent|administrat)", "prodajn\\w* (asistent|podrsk|administracij)", "fakturis"
+      ] },
+    { "id": "client-relations", "label": "Odnosi sa klijentima", "weight": 20,
+      "patterns": [
+        "(client|customer) (relations|relationship)", "customer success (assistant|associate|specialist)", "account (assistant|coordinator)", "odnos\\w* sa (klijent|kupc)", "briga o (klijent|korisnic|kupc)", "rad sa (klijent|kupc|strank)", "komunikacij\\w* sa (klijent|kupc|korisnic)"
+      ] },
+    { "id": "appointments", "label": "Zakazivanje / lead gen", "weight": 10,
+      "patterns": [ "appointment (sett|schedul)", "lead gen", "outreach (assistant|specialist)", "zakazivanj\\w* (termin|sastan)", "telefonsk\\w* zakazivanj", "kontaktiranj\\w* klijen" ] },
+    { "id": "telesales", "label": "Telemarketing / telesales", "weight": 5,
+      "patterns": [ "telemarketing", "telesales", "tele-?sales", "(inbound|phone|telephone) sales", "sales agent", "telefonsk\\w* prodaj", "prodajn\\w* agent", "telemarket", "prodaj\\w* (putem|preko) telefon", "\\bteleoperater" ] },
+    { "id": "data-entry", "label": "Unos podataka", "weight": 20,
+      "patterns": [
+        "data (entry|processing|input|admin|administrator|capture|clean)", "(records|documentation|document processing|crm|database) (assistant|clerk|specialist|administrator)", "\\bcrm\\b (data|entry|assistant|update)", "\\btypist\\b", "typing",
+        "unos\\w* podataka", "obrad\\w* podataka", "azuriranj\\w* (podataka|baz)", "rad (sa|u) baz", "unos\\w* (dokumen|faktur|racun|artik)", "obrad\\w* dokumen", "daktilograf", "kucanj\\w* tekst", "unos\\w* (u )?(sistem|program|bazu)"
+      ] },
+    { "id": "listings", "label": "Unos proizvoda / katalog", "weight": 20,
+      "patterns": [
+        "product (listing|data|content|upload|catalog)", "listing (specialist|assistant|coordinator)", "catalog(ue)? (assistant|specialist|management)", "content upload",
+        "unos\\w* (proizvod|artik)", "postavljanj\\w* proizvod", "azuriranj\\w* (proizvod|katalog|sajt|web ?shop)", "uredjivanj\\w* katalog", "administracij\\w* proizvod"
+      ] },
+    { "id": "moderation", "label": "Moderacija", "weight": 10,
+      "patterns": [ "content (moderat|review)", "community (moderat|support|manag)", "forum moderat", "moderat\\w* (sadrzaj|foruma|grup|komentar)", "user support moderator" ] },
+    { "id": "ai-rating", "label": "AI ocenjivanje / anotacija", "weight": 10,
+      "patterns": [
+        "(internet|ads|search|content|online|ai|web|media) (assessor|rater|evaluator|judge|analyst)", "online data analyst", "search quality", "data (annotat|label|collect)", "annotator", "labeler", "ai (data|training|evaluator|specialist|tutor|trainer)",
+        "transcri", "ocenjivac", "anotaci", "\\bevaluator", "\\brater\\b", "linguist", "lingvist"
+      ] },
+    { "id": "cad", "label": "Arhitektura / CAD", "weight": 5,
+      "patterns": [ "autocad", "\\bcad\\b", "draft(er|ing)", "architectural (assistant|technician)", "arhitekt", "tehnick\\w* crta", "projektant" ] }
+  ],
+
+  "language": {
+    "serbianRequired": [ "\\bserbian\\b", "\\bsrpsk", "\\bbosnian\\b", "\\bcroatian\\b", "\\bbosansk", "\\bhrvatsk", "\\bbcs\\b", "\\bbhs\\b", "serbo-?croatian", "srpskohrvatsk", "balkan languages", "ex-?yu\\b", "crnogorsk", "montenegrin" ],
+    "serbianRequiredScore": 40,
+    "serbianAdWords": [ "\\bposao\\b", "\\bposlov", "\\bradno\\b", "\\bvreme\\b", "\\buslovi\\b", "\\bkandidat", "\\bprijav", "\\biskustv", "\\bznanje\\b", "\\bobavez", "\\bzaduzenj", "\\bnudimo\\b", "\\boglas", "\\bpotrebn", "\\btrazimo\\b", "\\bfirma\\b", "\\bkompanij", "\\bzaposlen", "\\bplata\\b", "\\bzarada\\b", "\\bugovor", "\\bobuk" ],
+    "serbianAdMinWords": 3,
+    "serbianAdScore": 30,
+    "basicEnglish": [
+      "basic english", "elementary english", "english (is )?(a )?(plus|bonus|advantage)", "english (preferred|desirable|nice to have|optional)", "basic (knowledge|understanding|command) of english", "some english",
+      "osnovn\\w* (znanje |poznavanje |nivo )?engleskog", "engleski[^.\\n]{0,25}(pozeljn|prednost|osnovn|nije obavez)", "engleskog[^.\\n]{0,25}(pozeljn|prednost|osnovn|nije obavez)", "poznavanje engleskog jezika", "pasivn\\w* (znanje |poznavanje )?engleskog"
+    ],
+    "basicEnglishScore": 10,
+    "englishHardReject": [
+      "english[^.\\n]{0,25}\\b(b2|c1|c2)\\b", "\\b(b2|c1|c2)\\b[^.\\n]{0,15}english",
+      "(fluent|fluency|advanced|excellent|proficient|proficiency|professional|business|native|near[- ]native|strong|perfect|superior|impeccable|full working|c1|c2|b2)(?:[- ]level|[- ]working proficiency| knowledge| command| speaker| skills| written and spoken| spoken and written)?(?: in| of)?(?: the)?(?: written| spoken| verbal)?(?: and (?:written|spoken|verbal))? english",
+      "english[^.\\n]{0,20}(fluen|advanced|proficien|native|excellent|professional|mandatory|required|is a must|essential)",
+      "english[- ]speaking", "english (customer|support|sales|speaker|language) ", "\\benglish\\b[^.\\n]{0,10}\\((required|mandatory)\\)",
+      "(odlicn|napredn|tecn|visok|aktivn|profesionaln|savrsen|izvrsn|perfektn|obavezn|neophodn)\\w*[^.\\n]{0,25}(znanje |poznavanje |nivo )?engleskog",
+      "engleski jezik[^.\\n]{0,30}(odlicn|napredn|tecn|visok|b2|c1|c2|aktivn|profesionaln|obavezn|neophodn)", "engleskog jezika[^.\\n]{0,30}(odlicn|napredn|tecn|visok|b2|c1|c2|aktivn|profesionaln|obavezn|neophodn)",
+      "\\b(b2|c1|c2)\\b[^.\\n]{0,20}engles", "engles\\w*[^.\\n]{0,20}\\b(b2|c1|c2)\\b", "engleski[^.\\n]{0,5}(je )?obavez"
+    ],
+    "englishRejectExceptions": [ "\\bplus\\b", "preferred", "advantage", "nice to have", "pozeljn", "prednost", "nije obavez", "not required", "optional", "bonus" ],
+    "foreignLanguages": "nemack|njemack|german|deutsch|francusk|french|italijansk|italian|spansk|spanish|holandsk|dutch|portugalsk|portuguese|svedsk|swedish|norvesk|norwegian|dansk|danish|finsk|finnish|poljsk|polish|cesk|czech|slovack|slovak|slovenack|slovenian|madjarsk|hungarian|rumunsk|romanian|bugarsk|bulgarian|grck|greek|tursk|turkish|rusk|russian|arapsk|arabic|kinesk|chinese|japansk|japanese|korean|korejsk|hebrew|hebrejsk|ukrainian|ukrajinsk|albansk|albanian|flemish|flamansk|estonian|latvian|lithuanian|vietnamese|thai|indonesian|malay|tagalog|filipino|hindi|urdu|farsi|persian",
+    "foreignTitleScore": -100,
+    "foreignDescriptionPatterns": [
+      "(znanje|poznavanje|govorite|govori|tecno|fluentno|aktivno|neophodn\\w*|obavezn\\w*)[^.\\n]{0,15}\\b(LANG)\\w*( jezik)?",
+      "\\b(LANG)\\w*( jezik\\w*)?[^.\\n]{0,12}(obavezn|neophodn|je uslov|potrebn)",
+      "\\b(LANG)[a-z]*[- ]speaking", "(fluent|fluency|proficien|native)[^.\\n]{0,15}(in )?\\b(LANG)", "\\b(LANG)[a-z]*( language)?[^.\\n]{0,10}\\((required|mandatory|c1|c2|b2)\\)", "\\b(LANG)[a-z]* (speaker|native)"
+    ],
+    "foreignDescriptionScore": -100
+  },
+
+  "employment": {
+    "partTime": [
+      "part[- ]time", "nepuno radno vreme", "skracen\\w* radno vreme", "honorar", "pola radnog vremena", "polovin\\w* radnog vremena",
+      "\\b(10|12|15|20|25|30)\\s?[-–]\\s?(15|20|25|30|35)\\s?(hours|hrs|h|sati|sata)\\b", "\\b\\d{1,2}\\s?(hours|hrs|sati|sata)\\s?(per|a|/)?\\s?(week|nedelj|sedmic)",
+      "flexible (hours|schedule|working|time)", "fleksibiln\\w* (radno|vreme|satnic|raspored)", "freelance", "frilens", "\\bcontractor\\b", "\\bhourly\\b", "satnic", "dodatn\\w* (posao|zarad|prihod)", "povremen\\w* (posao|rad|angazman)", "choose your (own )?hours", "set your own (hours|schedule)", "less than 30 (hours|hrs)"
+    ],
+    "partTimeScore": 30,
+    "flexibleScore": 20,
+    "fullTimeScore": -40,
+    "remoteText": [ "\\bremote\\b", "work from home", "working from home", "rad od kuce", "\\bod kuce\\b", "home[- ]?based", "home office", "\\bwfh\\b", "rad na daljinu", "daljinsk", "\\bfully remote\\b", "\\btelework" ],
+    "onsiteText": [ "\\bon[- ]?site\\b", "\\bin[- ]office\\b", "u kancelariji", "rad u (firmi|kancelariji|prostorijama|poslovnici|objektu|magacinu|prodavnici)", "\\biz firme\\b", "office[- ]based", "u nasim prostorijama" ],
+    "remoteScore": 30,
+    "hybridScore": -30,
+    "onsiteScore": -80,
+    "unknownRemoteScore": -25
+  },
+
+  "location": {
+    "exclude": [
+      "\\b(us|usa|u\\.s\\.|united states|uk|united kingdom|canada|australia|philippines|india|latam|latin america|mexico|colombia|argentina|brazil|pakistan|nigeria|kenya|egypt|south africa)[- ]?(only|based only|residents only|candidates only|applicants only)\\b",
+      "only (open to|for|accepting)[^.\\n]{0,30}\\b(us|usa|united states|uk|canada|australia|philippines|india|latam|eu|european union)\\b",
+      "must (reside|live|be located|be based|be residing) in (the )?(us|usa|u\\.s\\.|united states|uk|united kingdom|canada|australia|germany|eu\\b|european union|philippines|india|latam|latin america|mexico|south africa|pakistan)",
+      "(us|u\\.s\\.|uk|eu|canadian|australian) (work )?(authorization|authorisation|citizen|permanent resident|green card)", "authori[sz]ed to work in (the )?(us|usa|united states|uk|eu|canada|australia)",
+      "eu (citizenship|passport|residen|work permit)", "(citizenship|residency) (in|of) the (eu|european union)", "right to work in (the )?(uk|eu|us|usa)",
+      "(based|located|residing) in (the )?(us|usa|united states|uk|united kingdom|philippines|india|latam|latin america|mexico|pakistan) (only|is required|required)",
+      "\\b(w2|w-2)\\b", "\\b(us|usa|uk) time ?zone only", "\\brelocation (is )?required"
+    ],
+    "excludeScore": -100,
+    "include": [ "\\bserbia\\b", "srbij", "\\bbalkan", "eastern europe", "south[- ]?east(ern)? europe", "\\bsee region\\b", "\\bworldwide\\b", "\\banywhere\\b", "\\bglobal(ly)?\\b", "\\bemea\\b", "\\bcet\\b", "\\bcest\\b", "\\beurope\\b", "\\beu\\b", "beograd", "belgrade", "novi sad", "\\bnis\\b", "kragujevac", "\\bsvi gradovi\\b" ],
+    "includeScore": 10
+  },
+
+  "negatives": {
+    "title": [
+      { "label": "IT / inženjering", "score": -100, "patterns": [ "developer", "programmer", "programer", "\\bengineer", "inzenjer", "devops", "\\bsoftware\\b", "\\bqa\\b", "\\btester\\b", "test automation", "data scientist", "machine learning", "(system|network|database|linux|windows|it|sistem|mrezn) administrator", "sysadmin", "full[- ]?stack", "front-?end", "back-?end", "\\.net\\b", "\\bjava\\b", "\\bpython\\b", "\\bphp\\b", "\\bsql\\b", "\\bcloud\\b", "cyber", "\\bsecurity\\b", "\\bscrum\\b", "product owner", "\\bux\\b", "\\bui\\b", "designer", "dizajner", "\\bseo\\b", "copywriter", "\\bcto\\b", "\\bcfo\\b", "\\bceo\\b" ] },
+      { "label": "senior / rukovodeća pozicija", "score": -60, "patterns": [ "\\bsenior\\b", "\\bsr\\.", "\\blead\\b", "team ?lead", "\\bhead of\\b", "\\bdirector\\b", "\\bmanager\\b", "\\bsupervisor\\b", "\\bchief\\b", "\\bvp\\b", "vice president", "rukovodilac", "\\bdirektor", "menadzer", "\\bsef\\b", "sefica", "supervizor", "vodja tima", "voditelj", "\\bprincipal\\b", "\\bexpert\\b", "\\bspecialist ii\\b" ] },
+      { "label": "medicina / pravo / računovodstvo sa licencom", "score": -100, "patterns": [ "\\bnurse\\b", "\\bdoctor\\b", "physician", "\\blekar", "\\bdoktor", "medicinsk", "farmaceut", "\\blawyer\\b", "attorney", "\\badvokat", "\\bpravnik", "accountant", "racunovodj", "knjigovodj", "\\brevizor", "\\bauditor\\b", "\\bcpa\\b", "\\bstomatolog", "fizioterapeut", "psiholog", "veterinar" ] },
+      { "label": "fizički / proizvodni posao", "score": -100, "patterns": [ "\\bvozac", "\\bdriver\\b", "magacion", "warehouse", "proizvodnj", "\\bmasinski\\b", "zavariva", "\\bkuvar", "konobar", "\\bcistac", "higijenic", "\\bkurir", "dostavlj", "\\bmonter", "elektricar", "\\bvulkanizer", "\\bbravar", "\\bstolar", "\\bkasir", "\\bprodavac\\b", "\\bmesar", "\\bpekar", "obezbedjenj", "\\bcuvar", "gradjevin", "\\bmoler", "\\bvarilac", "\\bkomercijalista na terenu", "terensk" ] },
+      { "label": "praksa / stažiranje", "score": -50, "patterns": [ "inte?rn?ship", "\\bintern\\b", "\\bpraksa\\b", "pripravnik", "stazist", "\\btrainee\\b", "praktikant" ] },
+      { "label": "nevezana oblast", "score": -40, "patterns": [ "clinical", "klinick", "\\bmedical\\b", "pharma", "farmac", "regulatory", "logistic", "logistik", "\\bvideo\\b", "\\beditor\\b", "trucking", "dispatch", "dispecer", "freight", "transport", "\\bmarketing\\b", "graphic", "grafick", "content creator", "social media", "recruit", "regrut", "\\bhr\\b", "human resources", "ljudsk\\w* resurs", "payroll", "financ", "finansij", "\\btax\\b", "insurance", "osiguranj", "\\banalyst\\b", "analitic", "quality", "kvalitet", "procurement", "nabavk", "laborator", "\\bpr\\b", "public relations", "compliance", "\\baudit", "\\bcredit\\b", "\\bloan\\b" ] }
+    ],
+    "text": [
+      { "label": "samo provizija", "score": -50, "patterns": [ "commission[- ]only", "commission[- ]based only", "samo (na )?proviz", "iskljucivo (na )?proviz", "rad na procenat", "bez fiksn\\w* (plate|zarade|dela)", "no base (salary|pay)" ] },
+      { "label": "hladni pozivi", "score": -40, "patterns": [ "cold[- ]call", "hladn\\w* poziv" ] },
+      { "label": "noćna / US smena", "score": -40, "patterns": [ "night shift", "overnight shift", "graveyard", "nocn\\w* (smen|rad)", "\\b(us|est|pst|cst|pacific|eastern) (business )?hours\\b", "\\bus shift", "us time ?zone", "rad u tri smene" ] },
+      { "label": "od vrata do vrata", "score": -60, "patterns": [ "door[- ]to[- ]door", "od vrata do vrata", "field sales", "terensk\\w* prodaj" ] },
+      { "label": "neplaćeno / volontiranje", "score": -80, "patterns": [ "\\bunpaid\\b", "\\bvolunteer", "volonter", "neplacen" ] },
+      { "label": "traži se dugo specifično iskustvo", "score": -30, "patterns": [ "\\b(3|4|5|6|7|8|10)\\+? ?(years|yrs)( of)? (relevant |proven |professional |prior |hands-on )?experience", "(three|four|five)\\+? years", "minimum (of )?(3|4|5|6|7|8|10) (years|godin)", "najmanje (3|4|5|6|7|8|10) godin", "minimum (3|4|5|6|7|8|10) godin", "\\b(3|4|5|6|7|8|10)\\+? ?godin\\w* (relevantn\\w* |radn\\w* |profesionaln\\w* )?iskustv" ] },
+      { "label": "traži se fakultet iz nevezane oblasti", "score": -20, "patterns": [ "(bachelor|master|degree|diplom\\w*) (in|iz) (computer|engineering|finance|accounting|law|medic|nursing|pharma|economics|mathematics|statistics|informatik|masinstv|elektrotehni|pravn|medicin|farmac|ekonomij|matemat)" ] }
+    ]
+  },
+
+  "positives": [
+    { "id": "entry", "label": "Bez iskustva / entry level", "score": 15, "patterns": [ "entry[- ]level", "no (prior |previous )?experience (required|needed|necessary)", "bez (prethodnog |radnog )?iskustva", "iskustvo nije (potrebno|neophodno|obavezno|uslov)", "nije potrebno (radno |prethodno )?iskustvo", "\\bjunior\\b", "pocetni nivo", "beginner[- ]friendly" ] },
+    { "id": "training", "label": "Obuka obezbeđena", "score": 15, "patterns": [ "training (is )?(provided|included|will be provided|available)", "we (will )?train", "paid training", "full training", "\\bobuk[aeui]\\b", "obezbedjen\\w* obuk", "uvodn\\w* obuk", "placen\\w* obuk", "obuka (je )?obezbedjena" ] },
+    { "id": "computer", "label": "Osnovni rad na računaru", "score": 10, "patterns": [ "ms office", "microsoft office", "\\bexcel\\b", "google (workspace|sheets|docs|drive)", "basic computer", "computer (literacy|literate|skills)", "osnovn\\w* (znanje |poznavanje )?rada na racunar", "rad na racunar", "poznavanje rada na racunaru", "\\bcrm\\b", "chatgpt", "\\bai tools\\b", "\\bemail\\b", "\\bword\\b" ] },
+    { "id": "serbia-eligible", "label": "Otvoreno za Srbiju", "score": 10, "patterns": [ "\\bserbia\\b", "srbij", "\\bbalkan", "eastern europe", "worldwide", "\\banywhere\\b" ] }
+  ]
+}

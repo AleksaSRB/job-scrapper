@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="sr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Poslovi od kuće — novi oglasi</title>
+<style>
+  :root {
+    --bg: #f4f5f7; --card: #ffffff; --text: #16181d; --muted: #6b7280; --line: #e5e7eb;
+    --accent: #2563eb; --accent-2: #1d4ed8; --fav: #f59e0b; --ok: #16a34a; --danger: #ef4444;
+    --chip: #eef2ff; --chip-text: #3730a3; --lang: #fef3c7; --lang-text: #92400e; --cat: #ecfdf5; --cat-text: #047857;
+    --warn: #fee2e2; --warn-text: #991b1b;
+    --exc: #16a34a; --good: #2563eb; --pos: #6b7280;
+    --shadow: 0 1px 2px rgba(0,0,0,.05), 0 8px 24px -12px rgba(0,0,0,.18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0f1115; --card: #171a21; --text: #e7e9ee; --muted: #9aa3b2; --line: #262b35;
+      --accent: #3b82f6; --accent-2: #60a5fa; --chip: #1e2436; --chip-text: #c7d2fe; --lang: #3b2f0b; --lang-text: #fcd34d; --cat: #10261f; --cat-text: #6ee7b7;
+      --warn: #3b1111; --warn-text: #fca5a5; --exc: #22c55e; --good: #60a5fa; --pos: #9aa3b2;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.7); }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  a { color: inherit; }
+  header { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+  .bar { max-width: 1400px; margin: 0 auto; padding: 10px 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .brand { font-weight: 700; font-size: 18px; letter-spacing: -.01em; display: flex; align-items: center; gap: 8px; }
+  .tabs { display: flex; gap: 4px; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
+  .tab { border: 0; background: transparent; color: var(--muted); padding: 7px 14px; border-radius: 999px; cursor: pointer; font: inherit; font-weight: 600; }
+  .tab.active { background: var(--accent); color: #fff; }
+  .tab .n { opacity: .8; font-weight: 500; margin-left: 4px; }
+  .spacer { flex: 1; }
+  select, .btn { font: inherit; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--text); padding: 8px 12px; cursor: pointer; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  .btn.primary:hover { background: var(--accent-2); }
+  .btn:disabled { opacity: .6; cursor: progress; }
+  .meta-run { color: var(--muted); font-size: 13px; font-weight: 400; }
+  label.chk { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--muted); cursor: pointer; user-select: none; }
+  main { max-width: 1400px; margin: 0 auto; padding: 20px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(370px, 1fr)); gap: 18px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); display: flex; flex-direction: column; transition: opacity .25s, transform .25s; position: relative; }
+  .card.leaving { opacity: 0; transform: scale(.96); }
+  .card.fresh::before { content: "novo"; position: absolute; top: 12px; left: -28px; transform: rotate(-45deg); background: var(--danger); color: #fff; font-size: 11px; font-weight: 700; padding: 2px 32px; letter-spacing: .05em; text-transform: uppercase; z-index: 1; }
+  .head { display: flex; align-items: center; gap: 12px; padding: 14px 16px 0; }
+  .logo { width: 44px; height: 44px; border-radius: 10px; flex: none; background: linear-gradient(135deg, #cbd5e1, #94a3b8); display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 18px; overflow: hidden; }
+  .logo img { width: 100%; height: 100%; object-fit: contain; background: #fff; }
+  .company { font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .src { margin-left: auto; flex: none; padding: 3px 9px; border-radius: 999px; font-size: 12px; font-weight: 700; color: var(--muted); border: 1px solid var(--line); }
+  .body { padding: 10px 16px 6px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .title { margin: 0; font-size: 17px; font-weight: 700; line-height: 1.3; }
+  .loc { color: var(--muted); font-size: 14px; }
+  .match { display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 700; }
+  .match .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .match.excellent { color: var(--exc); } .match.excellent .dot { background: var(--exc); }
+  .match.good { color: var(--good); } .match.good .dot { background: var(--good); }
+  .match.possible { color: var(--pos); } .match.possible .dot { background: var(--pos); }
+  .match .score { font-weight: 500; color: var(--muted); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { background: var(--chip); color: var(--chip-text); padding: 3px 9px; border-radius: 999px; font-size: 12.5px; font-weight: 600; }
+  .chip.pay { background: var(--ok); color: #fff; }
+  .chip.lang { background: var(--lang); color: var(--lang-text); }
+  .chip.cat { background: var(--cat); color: var(--cat-text); }
+  .chip.warn { background: var(--warn); color: var(--warn-text); }
+  .sum { font-size: 14px; color: var(--text); opacity: .85; margin: 0; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+  .also { font-size: 12.5px; color: var(--muted); }
+  .also a { color: var(--accent); text-decoration: none; font-weight: 600; }
+  details { font-size: 13.5px; }
+  details summary { cursor: pointer; color: var(--accent); font-weight: 600; }
+  details p, details ul { margin: 6px 0 0; white-space: pre-wrap; color: var(--text); max-height: 360px; overflow: auto; }
+  details ul { padding-left: 18px; white-space: normal; font-family: ui-monospace, Consolas, monospace; font-size: 12.5px; }
+  .when { color: var(--muted); font-size: 12.5px; margin-top: auto; display: flex; gap: 8px; align-items: baseline; }
+  .link { border: 0; background: none; padding: 0; margin-left: auto; color: var(--muted); font: inherit; font-size: 12.5px; cursor: pointer; text-decoration: underline dotted; }
+  .link:hover { color: var(--danger); }
+  .actions { display: grid; grid-template-columns: 1fr 1fr 1fr 1.2fr; gap: 8px; padding: 10px 16px 14px; }
+  .actions .btn { text-align: center; text-decoration: none; font-weight: 600; font-size: 13.5px; padding: 9px 4px; white-space: nowrap; }
+  .btn.fav { color: var(--fav); border-color: color-mix(in srgb, var(--fav) 40%, var(--line)); }
+  .btn.fav:hover { background: color-mix(in srgb, var(--fav) 12%, var(--card)); }
+  .btn.app { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 40%, var(--line)); }
+  .btn.app:hover { background: color-mix(in srgb, var(--ok) 12%, var(--card)); }
+  .btn.rej { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 40%, var(--line)); }
+  .btn.rej:hover { background: color-mix(in srgb, var(--danger) 12%, var(--card)); }
+  .btn.open { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .empty { text-align: center; color: var(--muted); padding: 60px 20px; }
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--bg); padding: 10px 16px; border-radius: 10px; font-size: 14px; opacity: 0; transition: opacity .2s; pointer-events: none; max-width: 90vw; }
+  .toast.show { opacity: 1; }
+  @media (max-width: 640px) { .bar { padding: 8px 12px; } main { padding: 12px; } .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div class="brand">🏠 Poslovi od kuće <span class="meta-run" id="since"></span></div>
+    <div class="tabs">
+      <button class="tab active" data-tab="new">Novi<span class="n" id="n-new"></span></button>
+      <button class="tab" data-tab="favorite">Favoriti<span class="n" id="n-favorite"></span></button>
+      <button class="tab" data-tab="applied">Aplicirano<span class="n" id="n-applied"></span></button>
+      <button class="tab" data-tab="rejected">Odbačeno<span class="n" id="n-rejected"></span></button>
+    </div>
+    <div class="spacer"></div>
+    <select id="src"><option value="">Svi sajtovi</option></select>
+    <select id="cat"><option value="">Sve kategorije</option></select>
+    <select id="sort">
+      <option value="score">Najbolje poklapanje</option>
+      <option value="posted">Najnovije prvo</option>
+      <option value="found">Nedavno pronađeno</option>
+      <option value="salary">Plata opadajuće</option>
+    </select>
+    <label class="chk"><input type="checkbox" id="pt"> samo part-time</label>
+    <label class="chk"><input type="checkbox" id="sr"> samo srpski</label>
+    <button class="btn primary" id="scan">Skeniraj sad</button>
+    <span class="meta-run" id="lastrun"></span>
+  </div>
+</header>
+<main>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" hidden></div>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+const state = { tab: "new", src: "", cat: "", sort: "score", pt: false, sr: false, data: null, lastVisit: null };
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const when = (j) => j.postedAt ?? j.firstSeen;
+const LEVEL = { excellent: "Odličan match", good: "Dobar match", possible: "Moguć match", low: "Slab match" };
+const SRC = { infostud: "Infostud", startuj: "Startuj", poslovirs: "Poslovi.rs", jobrack: "JobRack", linkedin: "LinkedIn", wwr: "WWR", himalayas: "Himalayas", jooble: "Jooble" };
+const LANG_BADGE = /^(Srpski|BHS|Osnovni engleski|Oglas na srpskom)$/;
+const WARN_BADGE = /^(Full-time|Iz firme|Hibrid)$/;
+const EMP_BADGE = /^(Part-time|Honorarno|Ugovor|Fleksibilno|Remote|Privremeno|Bez iskustva|Obuka)$/;
+
+try { state.lastVisit = localStorage.getItem("lastVisit"); localStorage.setItem("lastVisit", new Date().toISOString()); } catch {}
+
+function toast(msg, ms = 2600) { const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), ms); }
+
+function fmtWhen(j) {
+  if (!j.postedAt) return "";
+  const d = new Date(j.postedAt);
+  const diff = (Date.now() - d.getTime()) / 60000;
+  if (diff < 1) return "upravo sad";
+  if (diff < 60) return `pre ${Math.round(diff)} min`;
+  if (diff < 24 * 60) return `pre ${Math.round(diff / 60)} h`;
+  if (diff < 14 * 24 * 60) return `pre ${Math.round(diff / 1440)} d`;
+  return d.toLocaleDateString("sr-RS");
+}
+
+function visible() {
+  let list = state.data.jobs.filter((j) => j.status === state.tab);
+  if (state.src) list = list.filter((j) => j.source === state.src || (j.alsoOn || []).some((a) => a.source === state.src));
+  if (state.cat) list = list.filter((j) => (j.categories || []).includes(state.cat));
+  if (state.pt) list = list.filter((j) => j.partTime);
+  if (state.sr) list = list.filter((j) => j.serbian || (j.badges || []).includes("Oglas na srpskom"));
+  if (state.sort === "salary") list.sort((a, b) => (b.salaryEurMonth ?? -1) - (a.salaryEurMonth ?? -1) || b.score - a.score);
+  else if (state.sort === "posted") list.sort((a, b) => when(b).localeCompare(when(a)));
+  else if (state.sort === "found") list.sort((a, b) => b.firstSeen.localeCompare(a.firstSeen) || b.score - a.score);
+  else list.sort((a, b) => b.score - a.score || when(b).localeCompare(when(a)));
+  return list;
+}
+
+function chip(b) {
+  const cls = LANG_BADGE.test(b) ? "lang" : WARN_BADGE.test(b) ? "warn" : EMP_BADGE.test(b) ? "" : "cat";
+  return `<span class="chip ${cls}">${esc(b)}</span>`;
+}
+
+function card(j) {
+  const initial = esc((j.company || j.title || "?").trim().charAt(0).toUpperCase());
+  const logo = j.companyLogo
+    ? `<img src="${esc(j.companyLogo)}" alt="" loading="lazy" referrerpolicy="no-referrer" data-i="${initial}" onerror="this.replaceWith(this.dataset.i)">`
+    : initial;
+  const pay = j.salaryText
+    ? `<span class="chip pay" title="${j.salaryEurMonth != null ? `≈ ${j.salaryEurMonth.toLocaleString("sr-RS")} €/mes (gornja granica, približno)` : "valuta/period nepoznati"}">${esc(j.salaryText)}</span>`
+    : "";
+  const badges = (j.badges || []).map(chip).join("");
+  const also = (j.alsoOn || []).map((a) => `<a href="${esc(a.url)}" target="_blank" rel="noopener">${esc(SRC[a.source] || a.source)} ↗</a>`).join(" · ");
+  const back = `<button class="btn fav" data-act="new">↩ Vrati</button>`;
+  const fresh = state.lastVisit && j.firstSeen > state.lastVisit && state.tab === "new";
+  const reasons = (j.reasons || []).map((r) => `<li>${esc(r)}</li>`).join("");
+  return `<article class="card${fresh ? " fresh" : ""}" data-id="${esc(j.id)}">
+    <div class="head">
+      <div class="logo">${logo}</div>
+      <div class="company" title="${esc(j.company)}">${esc(j.company || "Nepoznata firma")}</div>
+      <span class="src">${esc(SRC[j.source] || j.source)}</span>
+    </div>
+    <div class="body">
+      <h3 class="title">${esc(j.title)}</h3>
+      <div class="loc">📍 ${esc(j.location || "Remote")}</div>
+      <div class="match ${esc(j.level)}"><span class="dot"></span>${LEVEL[j.level] || j.level} <span class="score">· ${j.score}</span></div>
+      <div class="chips">${pay}${badges}</div>
+      ${j.summary ? `<p class="sum">${esc(j.summary)}</p>` : ""}
+      ${also ? `<div class="also">Isti oglas i na: ${also}</div>` : ""}
+      ${j.description ? `<details><summary>Ceo opis</summary><p>${esc(j.description)}</p></details>` : ""}
+      ${reasons ? `<details><summary>Zašto ova ocena</summary><ul>${reasons}</ul></details>` : ""}
+      <div class="when"><span>${esc(fmtWhen(j))}${j.postedAt ? " · " : ""}pronađen ${esc(new Date(j.firstSeen).toLocaleString("sr-RS", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }))}</span>
+        ${j.company && state.tab === "new" ? `<button class="link" data-block="${esc(j.company)}" title="Odbaci sve oglase ove firme i ne prikazuj buduće">sakrij firmu</button>` : ""}</div>
+    </div>
+    <div class="actions">
+      ${state.tab === "favorite" ? back : `<button class="btn fav" data-act="favorite">★ Favorit</button>`}
+      ${state.tab === "applied" ? back : `<button class="btn app" data-act="applied">✔ Aplicirano</button>`}
+      ${state.tab === "rejected" ? back : `<button class="btn rej" data-act="rejected">✕ Odbaci</button>`}
+      <a class="btn open" href="${esc(j.url)}" target="_blank" rel="noopener">Otvori ↗</a>
+    </div>
+  </article>`;
+}
+
+function fillSelects() {
+  const sel = $("#src");
+  const srcs = [...new Set(state.data.jobs.flatMap((j) => [j.source, ...(j.alsoOn || []).map((a) => a.source)]))].sort();
+  const cur = sel.value;
+  sel.innerHTML = `<option value="">Svi sajtovi</option>` + srcs.map((s) => `<option value="${esc(s)}">${esc(SRC[s] || s)}</option>`).join("");
+  sel.value = srcs.includes(cur) ? cur : "";
+  state.src = sel.value;
+  const cs = $("#cat");
+  const labels = state.data.categoryLabels || {};
+  const cats = [...new Set(state.data.jobs.flatMap((j) => j.categories || []))].filter((c) => labels[c]).sort((a, b) => labels[a].localeCompare(labels[b], "sr"));
+  const curc = cs.value;
+  cs.innerHTML = `<option value="">Sve kategorije</option>` + cats.map((c) => `<option value="${esc(c)}">${esc(labels[c])}</option>`).join("");
+  cs.value = cats.includes(curc) ? curc : "";
+  state.cat = cs.value;
+}
+
+const EMPTY = {
+  new: "Nema novih oglasa. Scraper proverava sajtove svakih 15 min, ili klikni „Skeniraj sad“.",
+  favorite: "Nema favorita — klikni ★ na kartici.",
+  applied: "Još nijedan oglas nije označen kao „Aplicirano“.",
+  rejected: "Nema odbačenih oglasa.",
+};
+
+function render() {
+  const d = state.data;
+  fillSelects();
+  for (const s of ["new", "favorite", "applied", "rejected"]) $("#n-" + s).textContent = d.jobs.filter((j) => j.status === s).length;
+  const fresh = state.lastVisit ? d.jobs.filter((j) => j.status === "new" && j.firstSeen > state.lastVisit).length : 0;
+  $("#since").textContent = (d.baselineAt ? "od " + new Date(d.baselineAt).toLocaleDateString("sr-RS", { day: "2-digit", month: "2-digit" }) : "") + (fresh ? ` · ${fresh} novih od poslednje posete` : "");
+  $("#lastrun").textContent = d.lastRun ? `poslednja provera ${new Date(d.lastRun).toLocaleTimeString("sr-RS", { hour: "2-digit", minute: "2-digit" })}` : "još nije skenirano";
+  $("#lastrun").title = (d.lastRunSummary || "").split(" | ").join("\n");
+  const list = visible();
+  $("#grid").innerHTML = list.map(card).join("");
+  const empty = $("#empty");
+  empty.hidden = list.length > 0;
+  empty.textContent = EMPTY[state.tab];
+}
+
+async function load() {
+  const r = await fetch("/api/jobs", { cache: "no-store" });
+  state.data = await r.json();
+  render();
+}
+
+const DONE = { rejected: "Odbačeno", favorite: "Dodato u favorite ★", applied: "Označeno: aplicirano ✔", new: "Vraćeno u nove" };
+
+async function setStatus(id, status) {
+  const r = await fetch(`/api/jobs/${encodeURIComponent(id)}/status`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
+  if (!r.ok) { toast("Greška: " + (await r.text())); return; }
+  state.data.jobs.find((x) => x.id === id).status = status;
+  document.querySelector(`.card[data-id="${CSS.escape(id)}"]`)?.classList.add("leaving");
+  setTimeout(render, 220);
+  toast(DONE[status]);
+}
+
+async function blockCompany(company) {
+  if (!confirm(`Sakriti firmu „${company}“?\nSvi njeni novi oglasi se odbacuju i budući se ne prikazuju.`)) return;
+  const r = await fetch("/api/companies/block", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ company }) });
+  if (!r.ok) { toast("Greška: " + (await r.text())); return; }
+  const j = await r.json();
+  const gone = new Set(j.rejected || []);
+  for (const id of gone) document.querySelector(`.card[data-id="${CSS.escape(id)}"]`)?.classList.add("leaving");
+  for (const x of state.data.jobs) if (gone.has(x.id)) x.status = "rejected";
+  setTimeout(render, 220);
+  toast(`Firma sakrivena (${gone.size} oglasa odbačeno)`);
+}
+
+document.addEventListener("click", (e) => {
+  const tab = e.target.closest("[data-tab]");
+  if (tab) { state.tab = tab.dataset.tab; document.querySelectorAll("[data-tab]").forEach((t) => t.classList.toggle("active", t === tab)); render(); return; }
+  const block = e.target.closest("[data-block]");
+  if (block) { blockCompany(block.dataset.block); return; }
+  const act = e.target.closest("[data-act]");
+  if (act) setStatus(act.closest(".card").dataset.id, act.dataset.act);
+});
+$("#src").addEventListener("change", (e) => { state.src = e.target.value; render(); });
+$("#cat").addEventListener("change", (e) => { state.cat = e.target.value; render(); });
+$("#sort").addEventListener("change", (e) => { state.sort = e.target.value; render(); });
+$("#pt").addEventListener("change", (e) => { state.pt = e.target.checked; render(); });
+$("#sr").addEventListener("change", (e) => { state.sr = e.target.checked; render(); });
+$("#scan").addEventListener("click", async () => {
+  const b = $("#scan"); b.disabled = true; b.textContent = "Skeniram… (2–5 min)";
+  try {
+    const r = await fetch("/api/scrape", { method: "POST" });
+    const j = await r.json();
+    await load();
+    toast(j.ok ? "Gotovo — detalji po sajtu su u tooltip-u „poslednja provera“" : "Scraper vratio grešku (vidi data/scraper.log)", 5000);
+  } catch (err) { toast("Greška: " + err.message); }
+  b.disabled = false; b.textContent = "Skeniraj sad";
+});
+
+load().catch((e) => toast("Ne mogu da učitam oglase: " + e.message));
+setInterval(() => { if (!$("#scan").disabled) load().catch(() => {}); }, 60_000);
+</script>
+</body>
+</html>

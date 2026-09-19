@@ -1,0 +1,16 @@
+{
+  "name": "mama-poslovi",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Prati remote / part-time oglase za posao (podrška, administracija, nekretnine, unos podataka…) sa Infostud, Startuj, Poslovi.rs, JobRack, LinkedIn, We Work Remotely, Himalayas + lokalni UI na :3003",
+  "engines": { "node": ">=22.6" },
+  "scripts": {
+    "start": "node --experimental-strip-types --disable-warning=ExperimentalWarning src/server.ts",
+    "serve": "node --experimental-strip-types --disable-warning=ExperimentalWarning src/server.ts",
+    "scrape": "node --experimental-strip-types --disable-warning=ExperimentalWarning src/scrape.ts",
+    "scrape:force": "node --experimental-strip-types --disable-warning=ExperimentalWarning src/scrape.ts --force",
+    "scrape:loop": "node --experimental-strip-types --disable-warning=ExperimentalWarning src/scrape.ts --loop",
+    "score": "node --experimental-strip-types --disable-warning=ExperimentalWarning src/check-score.ts"
+  }
+}

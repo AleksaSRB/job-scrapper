@@ -1,0 +1,75 @@
+{
+  "port": 3003,
+  "lookbackDays": 5,
+  "intervalMin": 15,
+  "minScore": 50,
+  "ntfyTopic": "",
+  "sources": {
+    "infostud": { "enabled": true, "everyMin": 15 },
+    "startuj": { "enabled": true, "everyMin": 30 },
+    "poslovirs": { "enabled": true, "everyMin": 30 },
+    "jobrack": { "enabled": true, "everyMin": 30 },
+    "linkedin": { "enabled": true, "everyMin": 60 },
+    "wwr": { "enabled": true, "everyMin": 30 },
+    "himalayas": { "enabled": true, "everyMin": 30 },
+    "jooble": { "enabled": false, "everyMin": 60 }
+  },
+  "infostud": {
+    "maxPages": 3,
+    "maxDetails": 100,
+    "queries": [
+      "korisnička podrška", "agent korisničke podrške", "kontakt centar", "call centar",
+      "administrativni asistent", "administracija", "asistent", "back office",
+      "nekretnine", "rezervacije", "booking",
+      "internet prodaja", "web shop", "e-commerce", "porudžbine",
+      "unos podataka", "obrada podataka", "unos proizvoda",
+      "chat", "email podrška", "rad od kuće", "honorarno", "part time", "nepuno radno vreme",
+      "customer support", "virtual assistant", "data entry", "serbian"
+    ],
+    "remoteOnlyQueries": ["administracija", "asistent", "rad od kuće", "honorarno", "part time", "nepuno radno vreme"]
+  },
+  "startuj": {
+    "paths": ["/honorarni-poslovi", "/poslovi-za-mlade"],
+    "maxPages": 2
+  },
+  "poslovirs": {
+    "maxPages": 10,
+    "maxDetails": 40
+  },
+  "jobrack": {
+    "categories": ["support", "executive-assistant", "sales-marketing"],
+    "maxPages": 2,
+    "listPages": 3,
+    "maxDetails": 30
+  },
+  "linkedin": {
+    "location": "Serbia",
+    "maxPages": 2,
+    "maxDetails": 60,
+    "queries": [
+      "customer support", "customer service", "chat support", "korisnička podrška",
+      "virtual assistant", "administrative assistant", "administrativni asistent",
+      "real estate assistant", "property management assistant", "reservation agent", "booking assistant",
+      "ecommerce assistant", "order processing", "data entry", "product listing",
+      "serbian", "serbian speaking", "part time"
+    ]
+  },
+  "wwr": {
+    "feeds": ["remote-customer-support-jobs", "remote-sales-and-marketing-jobs", "all-other-remote-jobs", "remote-management-and-finance-jobs"]
+  },
+  "himalayas": {
+    "country": "RS",
+    "maxPages": 2,
+    "queries": ["serbian", "customer support", "virtual assistant", "data entry", "administrative assistant", "part time"]
+  },
+  "jooble": {
+    "apiKey": "",
+    "location": "Srbija",
+    "queries": ["korisnička podrška", "administrativni asistent", "rad od kuće", "unos podataka", "customer support serbian"]
+  },
+  "blockedCompanies": [],
+  "fx": {
+    "EUR": 1, "USD": 0.88, "GBP": 1.16, "CHF": 1.06, "CAD": 0.63, "AUD": 0.57, "RSD": 0.0085,
+    "PLN": 0.235, "SEK": 0.09, "NOK": 0.086, "DKK": 0.134, "CZK": 0.04, "RON": 0.2, "HUF": 0.0025, "BAM": 0.51, "INR": 0.0102
+  }
+}
