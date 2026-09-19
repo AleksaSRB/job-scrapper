@@ -108,9 +108,11 @@
       "\\b(10|12|15|20|25|30)\\s?[-–]\\s?(15|20|25|30|35)\\s?(hours|hrs|h|sati|sata)\\b", "\\b\\d{1,2}\\s?(hours|hrs|sati|sata)\\s?(per|a|/)?\\s?(week|nedelj|sedmic)",
       "flexible (hours|schedule|working|time)", "fleksibiln\\w* (radno|vreme|satnic|raspored)", "freelance", "frilens", "\\bcontractor\\b", "\\bhourly\\b", "satnic", "dodatn\\w* (posao|zarad|prihod)", "povremen\\w* (posao|rad|angazman)", "choose your (own )?hours", "set your own (hours|schedule)", "less than 30 (hours|hrs)"
     ],
+    "partTimeTitle": [ "part[- ]?time", "freelance", "frilens", "honorar", "nepuno radno vreme", "skracen\\w* radno vreme", "pola radnog vremena" ],
     "partTimeScore": 30,
     "flexibleScore": 20,
-    "fullTimeScore": -40,
+    "fullTimeText": [ "full[- ]?time", "puno radno vreme", "puno radno vrijeme", "\\b40 ?(hours|hrs|h|sati|sata)\\b", "\\b8 ?(sati|h) dnevno", "osmocasovno" ],
+    "fullTimeScore": -100000,
     "remoteText": [ "\\bremote\\b", "work from home", "working from home", "rad od kuce", "\\bod kuce\\b", "home[- ]?based", "home office", "\\bwfh\\b", "rad na daljinu", "daljinsk", "\\bfully remote\\b", "\\btelework" ],
     "onsiteText": [ "\\bon[- ]?site\\b", "\\bin[- ]office\\b", "u kancelariji", "rad u (firmi|kancelariji|prostorijama|poslovnici|objektu|magacinu|prodavnici)", "\\biz firme\\b", "office[- ]based", "u nasim prostorijama" ],
     "remoteScore": 30,

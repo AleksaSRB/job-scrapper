@@ -17,6 +17,8 @@ const EN_EXC = compile(L.englishRejectExceptions, "language.englishRejectExcepti
 const FOREIGN_TITLE = new RegExp(`\\b(${L.foreignLanguages})`, "i");
 const FOREIGN_DESC = compile(L.foreignDescriptionPatterns.map((p) => p.replace(/LANG/g, L.foreignLanguages)), "language.foreignDescriptionPatterns");
 const PART_TIME = compile(E.partTime, "employment.partTime");
+const FULL_TIME_TXT = compile(E.fullTimeText ?? [], "employment.fullTimeText");
+const PART_TIME_TITLE = compile(E.partTimeTitle ?? [], "employment.partTimeTitle");
 const REMOTE_TXT = compile(E.remoteText, "employment.remoteText");
 const ONSITE_TXT = compile(E.onsiteText, "employment.onsiteText");
 const LOC_EXCL = compile(LOC.exclude, "location.exclude");
@@ -118,10 +120,22 @@ export function scoreJob(job: Job): Scoring {
   if (job.employment.includes("part-time")) { add(E.partTimeScore, "part-time (polje sajta)"); badges.push("Part-time"); partTime = true; }
   else if (job.employment.includes("freelance") || job.employment.includes("contract")) { add(E.flexibleScore, `${job.employment.includes("freelance") ? "honorarno/freelance" : "ugovor"} (polje sajta)`); badges.push(job.employment.includes("freelance") ? "Honorarno" : "Ugovor"); partTime = true; }
   else if (job.employment.includes("full-time")) {
-    if (ptMatch) { add(E.flexibleScore, `full-time, ali pominje fleksibilnost ${quote(ptMatch[0])}`); badges.push("Fleksibilno"); partTime = true; }
-    else { add(E.fullTimeScore, "full-time (polje sajta)"); badges.push("Full-time"); }
+    const ptTitle = firstMatch(PART_TIME_TITLE, title);
+    if (ptTitle) {
+      // naslov izričito kaže part-time/freelance ("Freelance AI Trainer") -> naslov je jači od polja sajta
+      add(E.partTimeScore, `part-time/freelance u naslovu ${quote(ptTitle[0])} (polje sajta kaže full-time)`); badges.push("Part-time"); partTime = true;
+    } else {
+      // sajt kaže full-time -> kazna uvek (fullTimeScore u rules.json); pominjanje fleksibilnosti u opisu se samo beleži
+      add(E.fullTimeScore, "full-time (polje sajta)"); badges.push("Full-time");
+      if (ptMatch) add(E.flexibleScore, `ali pominje fleksibilnost ${quote(ptMatch[0])}`);
+    }
   } else if (ptMatch) { add(E.partTimeScore, `part-time / fleksibilno ${quote(ptMatch[0])}`); badges.push("Part-time"); partTime = true; }
-  else if (job.employment.includes("temporary")) badges.push("Privremeno");
+  else {
+    // sajt nema polje (Poslovi.rs, Jooble…) -> full-time se prepoznaje iz teksta
+    const ft = firstMatch(FULL_TIME_TXT, text);
+    if (ft) { add(E.fullTimeScore, `full-time ${quote(ft[0])}`); badges.push("Full-time"); }
+    else if (job.employment.includes("temporary")) badges.push("Privremeno");
+  }
 
   // ---- remote
   let remoteFinal: RemoteType = job.remote;

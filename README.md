@@ -40,8 +40,9 @@ developer/inženjer/IT, lekar/advokat/računovođa sa licencom, fizički i proiz
 
 **Glavni bodovi** (sve u `rules.json`): +40 srpski/BHS se traži · +30 oglas na srpskom · +30 part-time / honorarno / fleksibilno · +30 remote · +25 kategorija u naslovu
 (podrška, admin, nekretnine, booking, e-commerce; 20 za unos podataka, porudžbine; manje za telemarketing, AI rating, CAD) · +15 bez iskustva · +15 obuka · +10 osnovni engleski ·
-−40 full-time · −30 hibrid · −80 iz firme · −60 senior/manager/director (osim „asistent direktora“) · −40 nevezana oblast (klinički, logistika, finansije, marketing…) ·
-−50 samo provizija · −40 noćna/US smena · −40 hladni pozivi.
+**full-time = −100000 (sakriven; polje sajta ili „puno radno vreme“/„full-time“ u tekstu)** · −30 hibrid · −80 iz firme · −60 senior/manager/director (osim „asistent direktora“) ·
+−40 nevezana oblast (klinički, logistika, finansije, marketing…) · −50 samo provizija · −40 noćna/US smena · −40 hladni pozivi.
+Da se full-time oglasi opet vide kao „Moguć match“, vrati `rules.json → employment.fullTimeScore` na −40 i pokreni `npm run score -- --rescore`.
 
 Čipovi na kartici: plata (zeleno), radno vreme (Part-time / Honorarno / Full-time), Remote / Hibrid / Iz firme, jezik (Srpski / BHS / Osnovni engleski / Oglas na srpskom — žuto),
 kategorije (zeleno), Bez iskustva, Obuka. Traka „novo“ = pronađen posle tvoje poslednje posete stranici.
@@ -73,8 +74,9 @@ HelloWorld (ista baza kao Infostud), Joberty (SPA, samo IT) i Upwork (Cloudflare
 ## Tunovanje
 
 - `data/filtered.log` — svaki odbijen oglas sa razlogom i celim obračunom skora. Prvo mesto za gledanje kad nešto fali ili ima šuma.
-- `rules.json` — sve kategorije, jezička pravila, bodovi, pragovi. Posle izmene: `npm run score -- --rescore` ponovo oceni oglase u bazi (statusi ostaju);
-  oglasi koje je filter ranije odbio nisu u bazi — obriši `data/seen.json` da se sve proceni iznova.
+- `rules.json` — sve kategorije, jezička pravila, bodovi, pragovi. Posle izmene: `npm run score -- --rescore` ponovo oceni oglase u bazi:
+  novi koji sad padnu idu u „Odbačeno“ sa čipom „Sakriveno pravilima“, a takvi se automatski vraćaju u nove kad pravila opet propuste oglas
+  (ono što si sam odbacio/favorizovao se ne dira). Oglasi koje je filter odbio još pri skeniranju nisu u bazi — obriši `data/seen.json` da se sve proceni iznova.
 - `npm run score -- <deo naslova>` ispisuje pun obračun za oglas iz baze; `npm run score -- --all` tabelu svih.
 - `config.json` — port, `lookbackDays`, `minScore`, upiti po sajtu, `maxDetails` (koliko detalj-stranica po prolazu), `blockedCompanies`, kursevi `fx`.
 

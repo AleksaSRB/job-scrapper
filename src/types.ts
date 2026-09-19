@@ -62,6 +62,7 @@ export interface StoredJob extends Job {
   serbian: boolean;
   remoteFinal: RemoteType;
   alsoOn?: AlsoOn[];            // isti oglas na drugim sajtovima
+  hiddenByRules?: boolean;      // status "rejected" je postavio `score --rescore` (ne korisnik) -> sme da se vrati kad pravila opet propuste oglas
 }
 
 export interface SourceState { lastFetched: string; summary: string }
@@ -109,7 +110,7 @@ export interface Rules {
     foreignLanguages: string; foreignTitleScore: number; foreignDescriptionPatterns: string[]; foreignDescriptionScore: number;
   };
   employment: {
-    partTime: string[]; partTimeScore: number; flexibleScore: number; fullTimeScore: number;
+    partTime: string[]; partTimeTitle: string[]; partTimeScore: number; flexibleScore: number; fullTimeText: string[]; fullTimeScore: number;
     remoteText: string[]; onsiteText: string[]; remoteScore: number; hybridScore: number; onsiteScore: number; unknownRemoteScore: number;
   };
   location: { exclude: string[]; excludeScore: number; include: string[]; includeScore: number };

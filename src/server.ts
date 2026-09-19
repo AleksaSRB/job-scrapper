@@ -88,6 +88,7 @@ async function handler(req: IncomingMessage, res: ServerResponse): Promise<void>
       const j = db.jobs[id];
       if (!j) { sendJson(res, 404, { error: "oglas ne postoji" }); return; }
       j.status = status;
+      delete j.hiddenByRules; // korisnik je odlučio -> `score --rescore` više ne dira ovaj oglas
       saveDb(db);
       log(`status ${id} -> ${status}`);
       sendJson(res, 200, { ok: true, id, status });

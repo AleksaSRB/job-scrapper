@@ -169,7 +169,7 @@ function card(j) {
   const pay = j.salaryText
     ? `<span class="chip pay" title="${j.salaryEurMonth != null ? `≈ ${j.salaryEurMonth.toLocaleString("sr-RS")} €/mes (gornja granica, približno)` : "valuta/period nepoznati"}">${esc(j.salaryText)}</span>`
     : "";
-  const badges = (j.badges || []).map(chip).join("");
+  const badges = (j.badges || []).map(chip).join("") + (j.hiddenByRules ? `<span class="chip warn" title="Sakrila su ga pravila (rules.json), ne ti. Vraća se samo kad pravila opet propuste oglas ili klikom na ↩ Vrati.">Sakriveno pravilima</span>` : "");
   const also = (j.alsoOn || []).map((a) => `<a href="${esc(a.url)}" target="_blank" rel="noopener">${esc(SRC[a.source] || a.source)} ↗</a>`).join(" · ");
   const back = `<button class="btn fav" data-act="new">↩ Vrati</button>`;
   const fresh = state.lastVisit && j.firstSeen > state.lastVisit && state.tab === "new";

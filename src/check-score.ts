@@ -15,15 +15,17 @@ const db = loadDb();
 const jobs = Object.values(db.jobs);
 
 if (args.includes("--rescore")) {
-  let hidden = 0, changed = 0;
+  let hidden = 0, restored = 0, changed = 0;
   for (const j of jobs) {
     const s = scoreJob(j);
     if (s.score !== j.score) changed++;
     Object.assign(j, { score: s.score, level: s.level, reasons: s.reasons, categories: s.categories, badges: s.badges, partTime: s.partTime, serbian: s.serbian, remoteFinal: s.remoteFinal });
-    if (j.status === "new" && hideReason(s)) { j.status = "rejected"; hidden++; }
+    const hide = hideReason(s);
+    if (j.status === "new" && hide) { j.status = "rejected"; j.hiddenByRules = true; hidden++; }
+    else if (j.status === "rejected" && j.hiddenByRules && !hide) { j.status = "new"; delete j.hiddenByRules; restored++; } // sakrila su ga pravila, ne korisnik
   }
   saveDb(db);
-  console.log(`Ponovo ocenjeno ${jobs.length} oglasa, ${changed} promenjenih skorova, ${hidden} novih sklonjeno ispod praga ${CONFIG.minScore}.`);
+  console.log(`Ponovo ocenjeno ${jobs.length} oglasa, ${changed} promenjenih skorova, ${hidden} novih sklonjeno ispod praga ${CONFIG.minScore}, ${restored} vraćeno u nove.`);
 } else if (args.includes("--all") || args.length === 0) {
   for (const j of jobs.sort((a, b) => b.score - a.score)) console.log(`${String(j.score).padStart(4)} ${j.level.padEnd(9)} ${j.status.padEnd(8)} ${j.source.padEnd(9)} ${j.title} — ${j.company} (${j.id})`);
   console.log(`\n${jobs.length} oglasa u bazi.`);
