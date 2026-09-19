@@ -1,6 +1,6 @@
 {
   "port": 3003,
-  "lookbackDays": 5,
+  "lookbackDays": 10,
   "intervalMin": 15,
   "minScore": 50,
   "ntfyTopic": "",

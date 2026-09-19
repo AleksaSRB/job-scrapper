@@ -15,7 +15,7 @@ Potrebno: **Windows 10/11**, internet, **Node.js ≥ 22.6** (preporučeno LTS sa
 2. Dupli klik na **`setup.cmd`**. Skripta:
    - proveri Node.js (ako ga nema, a postoji `winget`, sama instalira Node.js LTS),
    - registruje zadatke `MamaPosloviScraper` (svakih 15 min) i `MamaPosloviServer` (pri logovanju + odmah),
-   - odradi **prvi prolaz odmah** — uzima oglase iz **poslednjih 5 dana** (`lookbackDays` u `config.json`) — i otvori http://localhost:3003.
+   - odradi **prvi prolaz odmah** — uzima oglase iz **poslednjih 10 dana** (`lookbackDays` u `config.json`) — i otvori http://localhost:3003.
 3. Posle toga sve ide samo: server se diže pri logovanju, scraper radi svakih 15 min. Ako je laptop bio ugašen, zadatak se pokrene čim se upali.
 
 Ostalo:
@@ -40,7 +40,8 @@ developer/inženjer/IT, lekar/advokat/računovođa sa licencom, fizički i proiz
 
 **Glavni bodovi** (sve u `rules.json`): +40 srpski/BHS se traži · +30 oglas na srpskom · +30 part-time / honorarno / fleksibilno · +30 remote · +25 kategorija u naslovu
 (podrška, admin, nekretnine, booking, e-commerce; 20 za unos podataka, porudžbine; manje za telemarketing, AI rating, CAD) · +15 bez iskustva · +15 obuka · +10 osnovni engleski ·
-**full-time = −100000 (sakriven; polje sajta ili „puno radno vreme“/„full-time“ u tekstu)** · −30 hibrid · −80 iz firme · −60 senior/manager/director (osim „asistent direktora“) ·
+**full-time = −100000 (sakriven; polje sajta ili „puno radno vreme“/„full-time“ u tekstu)** · **hibrid: prolazi (0) samo u Beogradu i samo ako je part-time, inače −100000** (`employment.hybridCities`) ·
+−80 iz firme · −60 senior/manager/director (osim „asistent direktora“) ·
 −40 nevezana oblast (klinički, logistika, finansije, marketing…) · −50 samo provizija · −40 noćna/US smena · −40 hladni pozivi.
 Da se full-time oglasi opet vide kao „Moguć match“, vrati `rules.json → employment.fullTimeScore` na −40 i pokreni `npm run score -- --rescore`.
 

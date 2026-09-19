@@ -106,8 +106,8 @@ export async function search(ctx: SearchCtx): Promise<Job[]> {
   const listed = new Map<string, ListJob>();
   // "" = svi remote oglasi bez upita (ima ih ~90) – hvata i ono što upiti promaše
   const plan: Array<{ q: string; remote: boolean }> = [{ q: "", remote: true }, ...queries.map((q) => ({ q, remote: remoteOnly.has(q.toLowerCase()) }))];
-  // sort po datumu ne postoji (Premium prvo), pa se lista sužava na oglase postavljene od baseline-a (najviše 7 dana unazad) -> ne promiču novi ne-Premium oglasi
-  const afterMs = Math.max(ctx.since.getTime(), Date.now() - 7 * 86_400_000);
+  // sort po datumu ne postoji (Premium prvo), pa se lista sužava na oglase postavljene od baseline-a (najviše lookbackDays unazad) -> ne promiču novi ne-Premium oglasi
+  const afterMs = Math.max(ctx.since.getTime(), Date.now() - Math.max(7, CONFIG.lookbackDays) * 86_400_000);
   const after = new Date(afterMs);
   const onlineAfter = `${after.getFullYear()}-${String(after.getMonth() + 1).padStart(2, "0")}-${String(after.getDate()).padStart(2, "0")}`;
   for (const { q, remote } of plan) {

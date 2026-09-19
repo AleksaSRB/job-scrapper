@@ -66,8 +66,8 @@ async function enrich(job: Job): Promise<void> {
 export async function search(ctx: SearchCtx): Promise<Job[]> {
   const { location, maxPages, maxDetails, queries } = CONFIG.linkedin;
   const found = new Map<string, Job>();
-  // prozor: od baseline-a, ali najviše 7 dana (scraper radi svakih sat vremena, seen.json pamti viđene – dalje nema smisla)
-  const tpr = Math.min(7 * 86_400, Math.max(86_400, Math.round((Date.now() - ctx.since.getTime()) / 1000) + 3600));
+  // prozor: od baseline-a, ali najviše lookbackDays (scraper radi svakih sat vremena, seen.json pamti viđene – dalje nema smisla)
+  const tpr = Math.min(Math.max(7, CONFIG.lookbackDays) * 86_400, Math.max(86_400, Math.round((Date.now() - ctx.since.getTime()) / 1000) + 3600));
   let rateLimited = false;
   for (const q of queries) {
     for (let page = 0; page < maxPages && !rateLimited; page++) {

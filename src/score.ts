@@ -20,6 +20,7 @@ const PART_TIME = compile(E.partTime, "employment.partTime");
 const FULL_TIME_TXT = compile(E.fullTimeText ?? [], "employment.fullTimeText");
 const PART_TIME_TITLE = compile(E.partTimeTitle ?? [], "employment.partTimeTitle");
 const REMOTE_TXT = compile(E.remoteText, "employment.remoteText");
+const HYBRID_CITIES = compile(E.hybridCities ?? [], "employment.hybridCities");
 const ONSITE_TXT = compile(E.onsiteText, "employment.onsiteText");
 const LOC_EXCL = compile(LOC.exclude, "location.exclude");
 const LOC_INCL = compile(LOC.include, "location.include");
@@ -140,7 +141,13 @@ export function scoreJob(job: Job): Scoring {
   // ---- remote
   let remoteFinal: RemoteType = job.remote;
   if (job.remote === "remote") { add(E.remoteScore, "remote (filter/polje sajta)"); badges.push("Remote"); }
-  else if (job.remote === "hybrid") { add(E.hybridScore, "hibrid (polje sajta)"); badges.push("Hibrid"); }
+  else if (job.remote === "hybrid") {
+    // hibrid prolazi samo u Beogradu (hybridCities) I samo ako je part-time; sve ostalo hibridno se sakriva (hybridElsewhereScore)
+    const cityHay = loc || text;
+    const inCity = HYBRID_CITIES.some((r) => r.test(cityHay));
+    if (inCity && partTime) { add(E.hybridScore, `hibrid u Beogradu + part-time ${quote(job.location || "Beograd")}`); badges.push("Hibrid (Beograd)"); }
+    else { add(E.hybridElsewhereScore, inCity ? "hibrid, ali nije part-time" : `hibrid van Beograda ${quote(job.location || "?")}`); badges.push("Hibrid"); }
+  }
   else if (job.remote === "onsite") { add(E.onsiteScore, "rad iz firme (polje sajta)"); badges.push("Iz firme"); }
   else {
     const r = firstMatch(REMOTE_TXT, text);

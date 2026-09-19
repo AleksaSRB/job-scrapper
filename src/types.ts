@@ -111,7 +111,9 @@ export interface Rules {
   };
   employment: {
     partTime: string[]; partTimeTitle: string[]; partTimeScore: number; flexibleScore: number; fullTimeText: string[]; fullTimeScore: number;
-    remoteText: string[]; onsiteText: string[]; remoteScore: number; hybridScore: number; onsiteScore: number; unknownRemoteScore: number;
+    remoteText: string[]; onsiteText: string[]; remoteScore: number;
+    hybridCities: string[]; hybridScore: number; hybridElsewhereScore: number; // hibrid prolazi samo u ovim gradovima I ako je part-time
+    onsiteScore: number; unknownRemoteScore: number;
   };
   location: { exclude: string[]; excludeScore: number; include: string[]; includeScore: number };
   negatives: { title: RuleGroup[]; text: RuleGroup[] };

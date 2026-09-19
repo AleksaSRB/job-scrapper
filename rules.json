@@ -116,7 +116,9 @@
     "remoteText": [ "\\bremote\\b", "work from home", "working from home", "rad od kuce", "\\bod kuce\\b", "home[- ]?based", "home office", "\\bwfh\\b", "rad na daljinu", "daljinsk", "\\bfully remote\\b", "\\btelework" ],
     "onsiteText": [ "\\bon[- ]?site\\b", "\\bin[- ]office\\b", "u kancelariji", "rad u (firmi|kancelariji|prostorijama|poslovnici|objektu|magacinu|prodavnici)", "\\biz firme\\b", "office[- ]based", "u nasim prostorijama" ],
     "remoteScore": 30,
-    "hybridScore": -30,
+    "hybridCities": [ "beograd", "belgrade", "zemun", "vozdovac", "zvezdara", "palilula", "rakovica", "cukarica", "vracar", "savski venac", "stari grad", "surcin", "grocka", "novi beograd" ],
+    "hybridScore": 0,
+    "hybridElsewhereScore": -100000,
     "onsiteScore": -80,
     "unknownRemoteScore": -25
   },
