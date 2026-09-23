@@ -15,4 +15,4 @@ foreach ($TaskName in 'MamaPosloviScraper', 'MamaPosloviServer') {
 Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue |
   Select-Object -ExpandProperty OwningProcess -Unique |
   ForEach-Object { Stop-Process -Id $_ -Force; Write-Host "Server proces $_ (port $Port) ugasen." }
-Write-Host 'Podaci (data/db.json – favoriti, statusi) su ostali netaknuti.'
+Write-Host 'Podaci (data/db.json - favoriti, statusi) su ostali netaknuti.'

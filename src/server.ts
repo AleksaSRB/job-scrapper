@@ -122,7 +122,11 @@ async function handler(req: IncomingMessage, res: ServerResponse): Promise<void>
   }
 }
 
-createServer(handler).listen(CONFIG.port, "127.0.0.1", () => {
+createServer(handler).on("error", (e: NodeJS.ErrnoException) => {
+  if (e.code === "EADDRINUSE") log(`STOP: port ${CONFIG.port} je zauzet (drugi program ili već pokrenut server). Promeni "port" u config.json ili ugasi taj program.`);
+  else log(`STOP: server ne može da se pokrene: ${e.message}`);
+  process.exit(1);
+}).listen(CONFIG.port, "127.0.0.1", () => {
   log(`UI: http://localhost:${CONFIG.port}`);
 });
 // localhost se nekad razreši na IPv6 – slušaj i tamo

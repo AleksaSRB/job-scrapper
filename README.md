@@ -19,9 +19,17 @@ Potrebno: **Windows 10/11**, internet, **Node.js ≥ 22.6** (preporučeno LTS sa
 3. Posle toga sve ide samo: server se diže pri logovanju, scraper radi svakih 15 min. Ako je laptop bio ugašen, zadatak se pokrene čim se upali.
 
 Ostalo:
-- **`update.cmd`** — povuče novu verziju sa GitHub-a (`git pull`) i restartuje server; podaci ostaju. Bez git-a: skini ZIP i prekopiraj fajlove preko postojećih (folder `data\` ne dirati).
+- **`start.cmd`** — ako se stranica ne otvara: upali server i otvori http://localhost:3003. Na Desktop-u postoji i prečica „Poslovi od kuće“.
+- **`update.cmd`** — povuče novu verziju sa GitHub-a (`git pull`) i restartuje server; podaci ostaju. Bez git-a: skini ZIP i prekopiraj fajlove preko postojećih (folder `data\` ne dirati), pa opet `setup.cmd`.
 - **`uninstall.cmd`** — ukloni zadatke i ugasi server; `data/` (favoriti, statusi) ostaje.
-- Ako se stranica ne otvara: `Start → Task Scheduler → MamaPosloviServer → Run`, ili ručno `npm run serve` u folderu.
+
+Šta `setup.cmd` obezbeđuje (provereno na Windows 11, 23.09.2026):
+- **Restart / gašenje laptopa**: server se diže sam pri logovanju (task `MamaPosloviServer`, uz automatski restart ako padne), scraper nastavlja svakih 15 min čim se računar probudi (`StartWhenAvailable`). Radi i na bateriji.
+- **Uvek isti port**: `config.json → port` (3003). Ako ga drži drugi program, instalacija stane sa jasnom porukom umesto da tiho ne radi; server u tom slučaju upiše `STOP: port 3003 je zauzet` u `data/server.out`.
+- **Baza ne može tiho da nestane**: `db.json`/`seen.json` se pišu sa fsync + `.bak` kopijom; oštećen fajl (npr. nestanak struje usred upisa) se čita iz `.bak`, a ako ni to ne valja scraper stane i ne piše preko njega (poruka `STOP:` u `data/scraper.log`).
+- **Logovi se ne gomilaju**: `scraper.log` i `filtered.log` se rotiraju na 5 MB.
+- **ZIP sa interneta**: skida se „Mark of the Web“ sa svih fajlova, pa Windows ne blokira skripte.
+- **Nema Node-a**: winget → ako ne ide, zvanični MSI sa nodejs.org (UAC potvrda).
 
 ## Šta se prikazuje
 

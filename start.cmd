@@ -1,0 +1,4 @@
+@echo off
+rem Dupli klik = (ponovo) upali server i otvori stranicu. Za slucaj da se stranica ne otvara.
+cd /d "%~dp0"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$p=3003; try { $p=(Get-Content '%~dp0config.json' -Raw | ConvertFrom-Json).port } catch {}; if (Get-ScheduledTask -TaskName MamaPosloviServer -ErrorAction SilentlyContinue) { Start-ScheduledTask -TaskName MamaPosloviServer } else { Write-Host 'Zadatak MamaPosloviServer ne postoji - pokreni setup.cmd'; exit 1 }; $ok=$false; foreach ($i in 1..10) { try { if ((Invoke-WebRequest -Uri ('http://localhost:' + $p + '/api/jobs') -UseBasicParsing -TimeoutSec 3).StatusCode -eq 200) { $ok=$true; break } } catch { Start-Sleep 1 } }; if ($ok) { Write-Host ('Server radi: http://localhost:' + $p); Start-Process ('http://localhost:' + $p) } else { Write-Host ('Server ne odgovara na portu ' + $p + ' - vidi data\server.out'); pause }"

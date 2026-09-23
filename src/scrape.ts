@@ -26,7 +26,7 @@ import * as linkedin from "./sources/linkedin.ts";
 import * as poslovirs from "./sources/poslovirs.ts";
 import * as startuj from "./sources/startuj.ts";
 import * as wwr from "./sources/wwr.ts";
-import { loadDb, loadSeen, log, logFiltered, saveDb, saveSeen, toStored, ts } from "./store.ts";
+import { CorruptStoreError, loadDb, loadSeen, log, logFiltered, saveDb, saveSeen, toStored, ts } from "./store.ts";
 import type { Job, SearchCtx, Source, StoredJob } from "./types.ts";
 
 const { values: args } = parseArgs({
@@ -190,7 +190,11 @@ export async function runOnce(force: boolean): Promise<void> {
 async function main(): Promise<void> {
   log(`Start | prag ${CONFIG.minScore} | ${args.loop ? `petlja ${CONFIG.intervalMin} min` : ONLY ? `samo ${[...ONLY].join(", ")}` : args.force ? "svi izvori (--force)" : "jedan prolaz"}`);
   for (;;) {
-    try { await runOnce(args.force === true); } catch (e) { log(`GREŠKA run: ${(e as Error).message}`); }
+    try { await runOnce(args.force === true); }
+    catch (e) {
+      if (e instanceof CorruptStoreError) { log(`STOP: ${e.message} — vrati data/db.json.bak ili obriši oštećen fajl pa pokreni ponovo.`); process.exitCode = 2; break; }
+      log(`GREŠKA run: ${(e as Error).message}`);
+    }
     if (!args.loop) break;
     await sleep(CONFIG.intervalMin * 60_000);
   }
