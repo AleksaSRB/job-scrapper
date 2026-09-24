@@ -63,11 +63,12 @@ kategorije (zeleno), Bez iskustva, Obuka. Traka „novo“ = pronađen posle tvo
 | Poslovi Infostud | `__NEXT_DATA__` JSON, upiti iz `config.json` + svi remote oglasi; detalj za neviđene | 15 min |
 | Startuj Infostud | liste honorarnih poslova i poslova za mlade; isti id kao Infostud | 30 min |
 | Poslovi.rs | AJAX lista cele ponude (~240), sticker RDK = rad od kuće; detalj samo za relevantne | 30 min |
+| Halooglasi (Posao) | `posao-pretraga?u_poslednjih_h=…` cela lista za period (Cloudflare → curl); detalj daje datum, puno/nepuno, platu, grad | 30 min |
 | JobRack | kategorije support / executive-assistant / sales-marketing + glavna lista | 30 min |
 | LinkedIn | javni guest API, `location=Serbia`, remote, poslednjih N dana; pauze zbog rate limita | 60 min |
 | We Work Remotely | RSS customer-support, sales, all-other, management | 30 min |
 | Himalayas | JSON API, `country=RS` | 30 min |
-| Jooble | samo zvaničan API sa ključem (`jooble.apiKey`) — isključen dok ključa nema | – |
+| Jooble | ❌ sajt i API endpoint su iza Cloudflare challenge-a (24.09.2026) — adapter postoji, isključen | – |
 
 Task se pali na 15 min, a svaki izvor se čita kad mu istekne `everyMin`. „Skeniraj sad“ u UI-ju i `npm run scrape:force` čitaju sve odmah.
 HelloWorld (ista baza kao Infostud), Joberty (SPA, samo IT) i Upwork (Cloudflare) nisu podržani — detalji u [docs/sources.md](docs/sources.md).

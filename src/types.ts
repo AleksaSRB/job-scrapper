@@ -1,4 +1,4 @@
-export type Source = "infostud" | "startuj" | "poslovirs" | "jobrack" | "linkedin" | "wwr" | "himalayas" | "jooble";
+export type Source = "infostud" | "startuj" | "poslovirs" | "halooglasi" | "jobrack" | "linkedin" | "wwr" | "himalayas" | "jooble";
 export type Status = "new" | "favorite" | "applied" | "rejected";
 export type SalaryPeriod = "year" | "month" | "week" | "day" | "hour";
 export type RemoteType = "remote" | "hybrid" | "onsite" | "unknown";
@@ -88,6 +88,7 @@ export interface Config {
   infostud: { maxPages: number; maxDetails: number; queries: string[]; remoteOnlyQueries: string[] };
   startuj: { paths: string[]; maxPages: number };
   poslovirs: { maxPages: number; maxDetails: number };
+  halooglasi: { maxPages: number; maxDetails: number };
   jobrack: { categories: string[]; maxPages: number; listPages: number; maxDetails: number };
   linkedin: { location: string; maxPages: number; maxDetails: number; queries: string[] };
   wwr: { feeds: string[] };

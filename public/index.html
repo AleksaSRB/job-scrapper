@@ -123,7 +123,7 @@ const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const when = (j) => j.postedAt ?? j.firstSeen;
 const LEVEL = { excellent: "Odličan match", good: "Dobar match", possible: "Moguć match", low: "Slab match" };
-const SRC = { infostud: "Infostud", startuj: "Startuj", poslovirs: "Poslovi.rs", jobrack: "JobRack", linkedin: "LinkedIn", wwr: "WWR", himalayas: "Himalayas", jooble: "Jooble" };
+const SRC = { infostud: "Infostud", startuj: "Startuj", poslovirs: "Poslovi.rs", halooglasi: "Halooglasi", jobrack: "JobRack", linkedin: "LinkedIn", wwr: "WWR", himalayas: "Himalayas", jooble: "Jooble" };
 const LANG_BADGE = /^(Srpski|BHS|Osnovni engleski|Oglas na srpskom)$/;
 const WARN_BADGE = /^(Full-time|Iz firme|Hibrid)$/;
 const EMP_BADGE = /^(Part-time|Honorarno|Ugovor|Fleksibilno|Remote|Privremeno|Bez iskustva|Obuka)$/;

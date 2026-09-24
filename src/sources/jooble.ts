@@ -3,7 +3,8 @@
  * pa se koristi samo zvaničan API sa ključem: POST https://jooble.org/api/<key>  {keywords, location, page}
  *   -> { totals, jobs: [{ id, title, location, snippet, salary, source, type, link, company, updated }] }
  * Ključ se traži besplatno na https://jooble.org/api/about i upisuje u config.json -> jooble.apiKey; dok ga nema, izvor je isključen.
- * NAPOMENA: API nije testiran uživo (nema ključa) – ako i on vraća Cloudflare stranu, izvor ostaje isključen.
+ * NAPOMENA 24.09.2026: i sam API endpoint (POST jooble.org/api/<ključ>) vraća Cloudflare challenge iz curl-a i Node-a,
+ * pa ni ključ ne pomaže bez pravog browsera. Izvor ostaje isključen; adapter stoji za slučaj da Jooble skloni zaštitu.
  */
 import { CONFIG } from "../config.ts";
 import { fetchText, htmlToText, sleep, toIso, truncate } from "../http.ts";

@@ -8,6 +8,7 @@
     "infostud": { "enabled": true, "everyMin": 15 },
     "startuj": { "enabled": true, "everyMin": 30 },
     "poslovirs": { "enabled": true, "everyMin": 30 },
+    "halooglasi": { "enabled": true, "everyMin": 30 },
     "jobrack": { "enabled": true, "everyMin": 30 },
     "linkedin": { "enabled": true, "everyMin": 60 },
     "wwr": { "enabled": true, "everyMin": 30 },
@@ -34,6 +35,10 @@
   },
   "poslovirs": {
     "maxPages": 10,
+    "maxDetails": 40
+  },
+  "halooglasi": {
+    "maxPages": 15,
     "maxDetails": 40
   },
   "jobrack": {

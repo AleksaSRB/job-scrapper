@@ -29,6 +29,7 @@ const DEFAULTS: Config = {
     infostud: { enabled: true, everyMin: 15 },
     startuj: { enabled: true, everyMin: 30 },
     poslovirs: { enabled: true, everyMin: 30 },
+    halooglasi: { enabled: true, everyMin: 30 },
     jobrack: { enabled: true, everyMin: 30 },
     linkedin: { enabled: true, everyMin: 60 },
     wwr: { enabled: true, everyMin: 30 },
@@ -38,6 +39,7 @@ const DEFAULTS: Config = {
   infostud: { maxPages: 2, maxDetails: 40, queries: ["korisnička podrška", "administrativni asistent"], remoteOnlyQueries: [] },
   startuj: { paths: ["/honorarni-poslovi"], maxPages: 1 },
   poslovirs: { maxPages: 8, maxDetails: 30 },
+  halooglasi: { maxPages: 15, maxDetails: 40 },
   jobrack: { categories: ["support", "executive-assistant"], maxPages: 1, listPages: 2, maxDetails: 20 },
   linkedin: { location: "Serbia", maxPages: 1, maxDetails: 30, queries: ["customer support"] },
   wwr: { feeds: ["remote-customer-support-jobs"] },
@@ -54,7 +56,7 @@ function loadConfig(): Config {
   return {
     ...DEFAULTS, ...user,
     port: Number(process.env.MOM_JOBS_PORT) || user.port || DEFAULTS.port,
-    sources: merge("sources"), infostud: merge("infostud"), startuj: merge("startuj"), poslovirs: merge("poslovirs"),
+    sources: merge("sources"), infostud: merge("infostud"), startuj: merge("startuj"), poslovirs: merge("poslovirs"), halooglasi: merge("halooglasi"),
     jobrack: merge("jobrack"), linkedin: merge("linkedin"), wwr: merge("wwr"), himalayas: merge("himalayas"), jooble: merge("jooble"),
     fx: merge("fx"),
   };

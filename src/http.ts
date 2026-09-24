@@ -90,6 +90,26 @@ export async function fetchJson<T = any>(url: string, opts: FetchOpts = {}): Pro
   try { return JSON.parse(body) as T; } catch { throw new Error(`nije JSON: ${body.slice(0, 120).replace(/\s+/g, " ")}`); }
 }
 
+/** JSON objekat/niz koji počinje na `start` u tekstu (npr. `QuidditaEnvironment.serverListData={...};` na halooglasi.com). */
+export function extractJson(text: string, start: number): unknown {
+  const open = text[start];
+  if (open !== "{" && open !== "[") throw new Error("nije početak JSON-a");
+  let depth = 0, inStr = false, esc = false;
+  for (let i = start; i < text.length; i++) {
+    const c = text[i];
+    if (inStr) {
+      if (esc) esc = false;
+      else if (c === "\\") esc = true;
+      else if (c === '"') inStr = false;
+      continue;
+    }
+    if (c === '"') inStr = true;
+    else if (c === "{" || c === "[") depth++;
+    else if (c === "}" || c === "]") { depth--; if (depth === 0) return JSON.parse(text.slice(start, i + 1)); }
+  }
+  throw new Error("JSON nije zatvoren");
+}
+
 /** `<script id="__NEXT_DATA__">` -> props.pageProps (Infostud). */
 export function nextData<T = any>(html: string): T | null {
   const m = html.match(/<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/);

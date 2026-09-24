@@ -18,6 +18,7 @@ import { companyBlocked, DedupIndex } from "./dedup.ts";
 import { sleep } from "./http.ts";
 import { fmtSalary, salaryEurMonth } from "./salary.ts";
 import { hideReason, scoreJob } from "./score.ts";
+import * as halooglasi from "./sources/halooglasi.ts";
 import * as himalayas from "./sources/himalayas.ts";
 import * as infostud from "./sources/infostud.ts";
 import * as jobrack from "./sources/jobrack.ts";
@@ -37,6 +38,7 @@ const SOURCES: Array<{ name: Source; search: (ctx: SearchCtx) => Promise<Job[]> 
   { name: "infostud", search: infostud.search },
   { name: "startuj", search: startuj.search },
   { name: "poslovirs", search: poslovirs.search },
+  { name: "halooglasi", search: halooglasi.search },
   { name: "jobrack", search: jobrack.search },
   { name: "wwr", search: wwr.search },
   { name: "himalayas", search: himalayas.search },
