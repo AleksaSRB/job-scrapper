@@ -33,7 +33,7 @@ const DEFAULTS: Config = {
     jobrack: { enabled: true, everyMin: 30 },
     linkedin: { enabled: true, everyMin: 60 },
     wwr: { enabled: true, everyMin: 30 },
-    himalayas: { enabled: true, everyMin: 30 },
+    himalayas: { enabled: false, everyMin: 30 }, // 24.09.2026: isključen – i „Serbian“ oglasi tamo traže engleski
     jooble: { enabled: false, everyMin: 60 },
   },
   infostud: { maxPages: 2, maxDetails: 40, queries: ["korisnička podrška", "administrativni asistent"], remoteOnlyQueries: [] },

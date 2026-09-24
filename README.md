@@ -67,7 +67,7 @@ kategorije (zeleno), Bez iskustva, Obuka. Traka „novo“ = pronađen posle tvo
 | JobRack | kategorije support / executive-assistant / sales-marketing + glavna lista | 30 min |
 | LinkedIn | javni guest API, `location=Serbia`, remote, poslednjih N dana; pauze zbog rate limita | 60 min |
 | We Work Remotely | RSS customer-support, sales, all-other, management | 30 min |
-| Himalayas | JSON API, `country=RS` | 30 min |
+| Himalayas | ❌ isključen 24.09.2026 (`sources.himalayas.enabled: false`): i oglasi sa „Serbian“ u naslovu traže engleski | – |
 | Jooble | ❌ sajt i API endpoint su iza Cloudflare challenge-a (24.09.2026) — adapter postoji, isključen | – |
 
 Task se pali na 15 min, a svaki izvor se čita kad mu istekne `everyMin`. „Skeniraj sad“ u UI-ju i `npm run scrape:force` čitaju sve odmah.
