@@ -42,7 +42,7 @@ Oglas dobija skor (vidi „Zašto ova ocena“ na kartici) i prikazuje se ako je
 | Moguć match | ≥ 50 |
 | (sakriven, u `data/filtered.log`) | < 50 |
 
-**Tvrdo odbijanje** (nikad se ne prikazuje): napredni engleski (B2/C1/C2, fluent, advanced, professional, „aktivno znanje engleskog“…) osim kad je „plus/poželjno“;
+**Tvrdo odbijanje** (nikad se ne prikazuje): **oglas nije napisan na srpskom/BHS** (od 26.09.2026, `language.requireSerbianAd`: broj srpskih reči mora biti ≥ 3 i ≥ broja engleskih; za kratak tekst dovoljna 1 srpska reč; ćirilica se latinizuje); napredni engleski (B2/C1/C2, fluent, advanced, professional, „aktivno znanje engleskog“…) osim kad je „plus/poželjno“;
 strani jezik u naslovu ili obavezan u opisu (nemački, francuski, italijanski…) a srpski se ne traži; lokacija koja isključuje Srbiju (US only, EU citizenship…);
 developer/inženjer/IT, lekar/advokat/računovođa sa licencom, fizički i proizvodni poslovi; oglas bez ijedne ciljane kategorije.
 
@@ -64,9 +64,9 @@ kategorije (zeleno), Bez iskustva, Obuka. Traka „novo“ = pronađen posle tvo
 | Startuj Infostud | liste honorarnih poslova i poslova za mlade; isti id kao Infostud | 30 min |
 | Poslovi.rs | AJAX lista cele ponude (~240), sticker RDK = rad od kuće; detalj samo za relevantne | 30 min |
 | Halooglasi (Posao) | `posao-pretraga?u_poslednjih_h=…` cela lista za period (Cloudflare → curl); detalj daje datum, puno/nepuno, platu, grad | 30 min |
-| JobRack | kategorije support / executive-assistant / sales-marketing + glavna lista | 30 min |
-| LinkedIn | javni guest API, `location=Serbia`, remote, poslednjih N dana; pauze zbog rate limita | 60 min |
-| We Work Remotely | RSS customer-support, sales, all-other, management | 30 min |
+| NSZ (Nacionalna služba za zapošljavanje) | zvanična pretraga `employee/jobs/search` po grupama zanimanja (administracija, trgovina, menadžment…) i ključnim rečima; detalj ima datum objave, mesto, radno vreme, nivo jezika; ćirilica se latinizuje | 30 min |
+| LinkedIn | javni guest API, `location=Serbia`, remote, poslednjih N dana; pauze zbog rate limita; prolaze samo oglasi sa srpskim opisom | 60 min |
+| JobRack, We Work Remotely | ❌ isključeni 26.09.2026: isključivo engleski oglasi, a oglas mora biti na srpskom (`sources.*.enabled`) | – |
 | Himalayas | ❌ isključen 24.09.2026 (`sources.himalayas.enabled: false`): i oglasi sa „Serbian“ u naslovu traže engleski | – |
 | Jooble | ❌ sajt i API endpoint su iza Cloudflare challenge-a (24.09.2026) — adapter postoji, isključen | – |
 

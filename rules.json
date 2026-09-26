@@ -74,7 +74,11 @@
   "language": {
     "serbianRequired": [ "\\bserbian\\b", "\\bsrpsk", "\\bbosnian\\b", "\\bcroatian\\b", "\\bbosansk", "\\bhrvatsk", "\\bbcs\\b", "\\bbhs\\b", "serbo-?croatian", "srpskohrvatsk", "balkan languages", "ex-?yu\\b", "crnogorsk", "montenegrin" ],
     "serbianRequiredScore": 40,
-    "serbianAdWords": [ "\\bposao\\b", "\\bposlov", "\\bradno\\b", "\\bvreme\\b", "\\buslovi\\b", "\\bkandidat", "\\bprijav", "\\biskustv", "\\bznanje\\b", "\\bobavez", "\\bzaduzenj", "\\bnudimo\\b", "\\boglas", "\\bpotrebn", "\\btrazimo\\b", "\\bfirma\\b", "\\bkompanij", "\\bzaposlen", "\\bplata\\b", "\\bzarada\\b", "\\bugovor", "\\bobuk" ],
+    "requireSerbianAd": true,
+    "serbianAdWords": [ "\\bposao\\b", "\\bposlov", "\\bradno\\b", "\\bvreme\\b", "\\buslovi\\b", "\\bkandidat", "\\bprijav", "\\biskustv", "\\bznanje\\b", "\\bobavez", "\\bzaduzenj", "\\bnudimo\\b", "\\boglas", "\\bpotrebn", "\\btrazimo\\b", "\\bfirma\\b", "\\bkompanij", "\\bzaposlen", "\\bplata\\b", "\\bzarada\\b", "\\bugovor", "\\bobuk",
+      "\\bkoji\\b", "\\bkoja\\b", "\\bkoje\\b", "\\bili\\b", "\\bkao\\b", "\\bsmo\\b", "\\bste\\b", "\\bbiti\\b", "\\bnase\\w*\\b", "\\bvase\\w*\\b", "\\bmogucnost", "\\bmesto\\b", "\\bmestu\\b", "\\bgodin", "\\bsati\\b", "\\bdana\\b", "\\bnedelj",
+      "\\badministrativn", "\\bsaradnik", "\\breferent", "\\bradnik", "\\bradnic", "\\boperater", "\\bprodaj", "\\bpodrsk", "\\bkorisni", "\\bod kuce\\b", "\\bkuce\\b", "\\bfirmi\\b", "\\bpozicij", "\\bopis\\b", "\\bplacen", "\\bhonorar", "\\bnepuno\\b", "\\bpuno\\b" ],
+    "englishAdWords": [ "\\bthe\\b", "\\band\\b", "\\bwith\\b", "\\byou\\b", "\\byour\\b", "\\bwe\\b", "\\bour\\b", "\\bfor\\b", "\\bwill\\b", "\\bthis\\b", "\\bthat\\b", "\\bare\\b", "\\bis\\b", "\\bto\\b", "\\bof\\b", "\\bfrom\\b", "\\bexperience\\b", "\\brequirements\\b", "\\bresponsibilities\\b", "\\bskills\\b", "\\bteam\\b", "\\bcustomers?\\b", "\\bworking\\b", "\\bremote\\b" ],
     "serbianAdMinWords": 3,
     "serbianAdScore": 30,
     "basicEnglish": [

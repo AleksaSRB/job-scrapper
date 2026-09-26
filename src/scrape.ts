@@ -24,6 +24,7 @@ import * as infostud from "./sources/infostud.ts";
 import * as jobrack from "./sources/jobrack.ts";
 import * as jooble from "./sources/jooble.ts";
 import * as linkedin from "./sources/linkedin.ts";
+import * as nsz from "./sources/nsz.ts";
 import * as poslovirs from "./sources/poslovirs.ts";
 import * as startuj from "./sources/startuj.ts";
 import * as wwr from "./sources/wwr.ts";
@@ -39,6 +40,7 @@ const SOURCES: Array<{ name: Source; search: (ctx: SearchCtx) => Promise<Job[]> 
   { name: "startuj", search: startuj.search },
   { name: "poslovirs", search: poslovirs.search },
   { name: "halooglasi", search: halooglasi.search },
+  { name: "nsz", search: nsz.search },
   { name: "jobrack", search: jobrack.search },
   { name: "wwr", search: wwr.search },
   { name: "himalayas", search: himalayas.search },

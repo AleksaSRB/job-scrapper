@@ -1,4 +1,4 @@
-export type Source = "infostud" | "startuj" | "poslovirs" | "halooglasi" | "jobrack" | "linkedin" | "wwr" | "himalayas" | "jooble";
+export type Source = "infostud" | "startuj" | "poslovirs" | "halooglasi" | "nsz" | "jobrack" | "linkedin" | "wwr" | "himalayas" | "jooble";
 export type Status = "new" | "favorite" | "applied" | "rejected";
 export type SalaryPeriod = "year" | "month" | "week" | "day" | "hour";
 export type RemoteType = "remote" | "hybrid" | "onsite" | "unknown";
@@ -89,6 +89,7 @@ export interface Config {
   startuj: { paths: string[]; maxPages: number };
   poslovirs: { maxPages: number; maxDetails: number };
   halooglasi: { maxPages: number; maxDetails: number };
+  nsz: { categories: number[]; queries: string[]; maxPages: number; maxDetails: number };
   jobrack: { categories: string[]; maxPages: number; listPages: number; maxDetails: number };
   linkedin: { location: string; maxPages: number; maxDetails: number; queries: string[] };
   wwr: { feeds: string[] };
@@ -105,7 +106,8 @@ export interface Rules {
   categories: Array<{ id: string; label: string; weight: number; patterns: string[] }>;
   language: {
     serbianRequired: string[]; serbianRequiredScore: number;
-    serbianAdWords: string[]; serbianAdMinWords: number; serbianAdScore: number;
+    requireSerbianAd: boolean;    // tvrdo: oglas mora biti napisan na srpskom (BHS); engleski oglasi se odbijaju
+    serbianAdWords: string[]; englishAdWords: string[]; serbianAdMinWords: number; serbianAdScore: number;
     basicEnglish: string[]; basicEnglishScore: number;
     englishHardReject: string[]; englishRejectExceptions: string[];
     foreignLanguages: string; foreignTitleScore: number; foreignDescriptionPatterns: string[]; foreignDescriptionScore: number;

@@ -17,6 +17,20 @@ Sve provere rađene sa `curl.exe` / Node `fetch` sa običnim Chrome User-Agentom
 | 10 | **Joberty** | ❌ | SPA (`backend.joberty.com`), sadržaj samo kroz JS, „limited access for non-contributors“ | Isključivo IT; preskočeno. |
 | — | **Upwork** | ❌ | Cloudflare challenge (i curl pada) | Isto kao u QA scraperu; jedini put je zvaničan GraphQL API uz nalog/ključ. Preskočeno. |
 
+## Dopuna 26.09.2026 — gde se još objavljuju poslovi na srpskom
+
+Uslov od 26.09: oglas mora biti napisan na srpskom (tvrdi filter u `rules.json → language.requireSerbianAd`), pa su JobRack i We Work Remotely isključeni (samo engleski).
+
+| Sajt | Status | Nalaz |
+|------|:-----:|-------|
+| **NSZ — nsz.gov.rs** | ✅ dodat | Zvanična pretraga `employee/jobs/search?search_term=…` ili `?category_id[]=<id>` (20 Администрација, 14 Трговина, 17 Менаџмент, 16 Економија, 24 Култура/ПР, 15 Угоститељство, 12 Архитектура), 20/strani; detalj `employee/jobs/preview/<id>`: opis, tabela (datum objave, врста рада, радно време, место рада, рад на рачунару, **језик са CEFR nivoom**). Ćirilica → latinica. NSZ agregira i Infostud i Lako do posla. `keyword` param ne filtrira, `search_term` da. Skoro sve iz firme (~200 oglasa, 0 remote u 10 dana). |
+| Lako do posla (lakodoposla.com) | — | Next.js SPA bez SSR sadržaja; oglasi su ionako u NSZ pretrazi („Огласи са портала Лако до посла“). Nije poseban adapter. |
+| oglasi.rs / posao | ⚠️ nije dodat | SSR (`/posao?s=d&i=96`, `<article itemprop>` sa datumom, firmom), ali ~175 oglasa ukupno, skoro sve fizički poslovi (vozači, kuvari, magacin); administracija: 1 oglas. Adapter bi bio lak (obrazac iz Stanovi/oglasi.ts) ako zatreba. |
+| KupujemProdajem — Poslovi | ⚠️ nije dodat | Next.js SSR, ali anti-bot captcha posle burst-a (iskustvo iz Stanovi scrapera) i uglavnom fizički/povremeni poslovi. |
+| zaposlenje.org | ❌ | Stari PHP sajt, praktično bez oglasa. |
+| jobs.rs, posao.rs, mojposao.rs, rs.indeed.com, bestjobs.rs | ❌ | Ne postoje / ne rade (DNS, TLS) ili parkiran domen. |
+| HelloWorld, Joberty | — | Isto kao ranije: Infostud baza / IT SPA. |
+
 ## Šta koji sajt daje
 
 | Polje | Infostud | Startuj | Poslovi.rs | JobRack | LinkedIn | WWR | Himalayas |

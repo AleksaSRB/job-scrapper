@@ -30,9 +30,10 @@ const DEFAULTS: Config = {
     startuj: { enabled: true, everyMin: 30 },
     poslovirs: { enabled: true, everyMin: 30 },
     halooglasi: { enabled: true, everyMin: 30 },
-    jobrack: { enabled: true, everyMin: 30 },
+    nsz: { enabled: true, everyMin: 30 },
+    jobrack: { enabled: false, everyMin: 30 },  // 26.09.2026: isključen – samo engleski oglasi, a oglas mora biti na srpskom
     linkedin: { enabled: true, everyMin: 60 },
-    wwr: { enabled: true, everyMin: 30 },
+    wwr: { enabled: false, everyMin: 30 },      // 26.09.2026: isto
     himalayas: { enabled: false, everyMin: 30 }, // 24.09.2026: isključen – i „Serbian“ oglasi tamo traže engleski
     jooble: { enabled: false, everyMin: 60 },
   },
@@ -40,6 +41,7 @@ const DEFAULTS: Config = {
   startuj: { paths: ["/honorarni-poslovi"], maxPages: 1 },
   poslovirs: { maxPages: 8, maxDetails: 30 },
   halooglasi: { maxPages: 15, maxDetails: 40 },
+  nsz: { categories: [20], queries: ["administrativni"], maxPages: 3, maxDetails: 30 },
   jobrack: { categories: ["support", "executive-assistant"], maxPages: 1, listPages: 2, maxDetails: 20 },
   linkedin: { location: "Serbia", maxPages: 1, maxDetails: 30, queries: ["customer support"] },
   wwr: { feeds: ["remote-customer-support-jobs"] },
@@ -56,7 +58,7 @@ function loadConfig(): Config {
   return {
     ...DEFAULTS, ...user,
     port: Number(process.env.MOM_JOBS_PORT) || user.port || DEFAULTS.port,
-    sources: merge("sources"), infostud: merge("infostud"), startuj: merge("startuj"), poslovirs: merge("poslovirs"), halooglasi: merge("halooglasi"),
+    sources: merge("sources"), infostud: merge("infostud"), startuj: merge("startuj"), poslovirs: merge("poslovirs"), halooglasi: merge("halooglasi"), nsz: merge("nsz"),
     jobrack: merge("jobrack"), linkedin: merge("linkedin"), wwr: merge("wwr"), himalayas: merge("himalayas"), jooble: merge("jooble"),
     fx: merge("fx"),
   };

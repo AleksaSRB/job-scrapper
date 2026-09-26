@@ -11,6 +11,7 @@ const L = RULES.language, E = RULES.employment, LOC = RULES.location;
 const CATS = RULES.categories.map((c) => ({ ...c, re: compile(c.patterns, `categories.${c.id}`) }));
 const SR_REQ = compile(L.serbianRequired, "language.serbianRequired");
 const SR_WORDS = compile(L.serbianAdWords, "language.serbianAdWords");
+const EN_WORDS = compile(L.englishAdWords ?? [], "language.englishAdWords");
 const EN_BASIC = compile(L.basicEnglish, "language.basicEnglish");
 const EN_HARD = L.englishHardReject.map((p) => new RegExp(p, "gi"));
 const EN_EXC = compile(L.englishRejectExceptions, "language.englishRejectExceptions");
@@ -83,15 +84,18 @@ export function scoreJob(job: Job): Scoring {
   if (job.employment.includes("internship")) add(-50, "praksa (polje sajta)");
 
   // ---- jezik
+  // ---- na kom jeziku je oglas napisan (tvrdi uslov: mora srpski/BHS; kratak tekst = samo naslov -> blaži prag)
+  const srCount = SR_WORDS.filter((r) => r.test(text)).length;
+  const enCount = EN_WORDS.filter((r) => r.test(text)).length;
+  const minWords = text.length < 300 ? 1 : L.serbianAdMinWords;
+  const serbianAd = srCount >= minWords && srCount >= enCount;
+  if (!serbianAd && L.requireSerbianAd) hardReject(`oglas nije na srpskom (srpskih reči ${srCount}, engleskih ${enCount})`);
   const srMatch = firstMatch(SR_REQ, text);
   const serbian = srMatch !== null;
   if (serbian) {
     add(L.serbianRequiredScore, `srpski/BHS se traži ${quote(srMatch![0])}`);
     badges.push(/bcs|bhs|bosn|croat|hrvat|serbo|srpskohrv/i.test(srMatch![0]) ? "BHS" : "Srpski");
-  } else {
-    const n = SR_WORDS.filter((r) => r.test(text)).length;
-    if (n >= L.serbianAdMinWords) { add(L.serbianAdScore, `oglas napisan na srpskom (${n} reči)`); badges.push("Oglas na srpskom"); }
-  }
+  } else if (serbianAd) { add(L.serbianAdScore, `oglas napisan na srpskom (${srCount} reči)`); badges.push("Oglas na srpskom"); }
   let englishHit: string | null = null;
   outer: for (const re of EN_HARD) {
     re.lastIndex = 0;

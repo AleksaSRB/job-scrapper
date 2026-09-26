@@ -9,9 +9,10 @@
     "startuj": { "enabled": true, "everyMin": 30 },
     "poslovirs": { "enabled": true, "everyMin": 30 },
     "halooglasi": { "enabled": true, "everyMin": 30 },
-    "jobrack": { "enabled": true, "everyMin": 30 },
+    "nsz": { "enabled": true, "everyMin": 30 },
+    "jobrack": { "enabled": false, "everyMin": 30 },
     "linkedin": { "enabled": true, "everyMin": 60 },
-    "wwr": { "enabled": true, "everyMin": 30 },
+    "wwr": { "enabled": false, "everyMin": 30 },
     "himalayas": { "enabled": false, "everyMin": 30 },
     "jooble": { "enabled": false, "everyMin": 60 }
   },
@@ -40,6 +41,12 @@
   "halooglasi": {
     "maxPages": 15,
     "maxDetails": 40
+  },
+  "nsz": {
+    "categories": [20, 14, 17, 16, 24, 15, 12],
+    "queries": ["administrativni", "podrška", "operater", "rad od kuće", "nepuno radno vreme", "honorarno", "nekretnine", "prodaja", "unos podataka"],
+    "maxPages": 5,
+    "maxDetails": 50
   },
   "jobrack": {
     "categories": ["support", "executive-assistant", "sales-marketing"],
