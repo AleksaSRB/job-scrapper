@@ -30,7 +30,7 @@ const { values: args } = parseArgs({
  * (dinamički import), pa pokvaren ili nedostajući adapter obori samo svoj red u izveštaju, ne ceo scraper.
  */
 const SOURCES: Source[] = [
-  "infostud", "startuj", "poslovirs", "halooglasi", "nsz", "kp", "pagewatch", "klikdoposla", "lalafo", "olxba", "sljaka", "oglaszaposao",
+  "infostud", "startuj", "poslovirs", "halooglasi", "nsz", "kp", "pagewatch", "klikdoposla", "lalafo", "olxba", "sljaka", "oglaszaposao", "honorarci",
   "jobrack", "wwr", "himalayas", "linkedin", "jooble",
 ];
 

@@ -21,21 +21,41 @@
     "lalafo": { "enabled": true, "everyMin": 120 },
     "olxba": { "enabled": true, "everyMin": 180 },
     "sljaka": { "enabled": true, "everyMin": 360 },
-    "oglaszaposao": { "enabled": true, "everyMin": 360 }
+    "oglaszaposao": { "enabled": true, "everyMin": 360 },
+    "honorarci": { "enabled": true, "everyMin": 360 }
   },
   "infostud": {
     "maxPages": 4,
     "maxDetails": 60,
     "sweeps": [
-      { "label": "remote + nepuno", "filters": "workPlaceTypes=remote&workingHours=5", "employment": ["part-time"] },
-      { "label": "remote + honorarno", "filters": "workPlaceTypes=remote&employmentTypes=9", "employment": ["freelance"] },
-      { "label": "svi remote", "filters": "workPlaceTypes=remote" },
-      { "label": "hibrid + nepuno", "filters": "workPlaceTypes=hybrid&workingHours=5", "employment": ["part-time"] },
-      { "label": "hibrid + honorarno", "filters": "workPlaceTypes=hybrid&employmentTypes=9", "employment": ["freelance"] }
+      {
+        "label": "remote + nepuno",
+        "filters": "workPlaceTypes=remote&workingHours=5",
+        "employment": [ "part-time" ]
+      },
+      {
+        "label": "remote + honorarno",
+        "filters": "workPlaceTypes=remote&employmentTypes=9",
+        "employment": [ "freelance" ]
+      },
+      {
+        "label": "svi remote",
+        "filters": "workPlaceTypes=remote"
+      },
+      {
+        "label": "hibrid + nepuno",
+        "filters": "workPlaceTypes=hybrid&workingHours=5",
+        "employment": [ "part-time" ]
+      },
+      {
+        "label": "hibrid + honorarno",
+        "filters": "workPlaceTypes=hybrid&employmentTypes=9",
+        "employment": [ "freelance" ]
+      }
     ]
   },
   "startuj": {
-    "paths": ["/honorarni-poslovi", "/poslovi-za-mlade"],
+    "paths": [ "/honorarni-poslovi", "/poslovi-za-mlade" ],
     "maxPages": 2
   },
   "poslovirs": {
@@ -50,9 +70,8 @@
     "maxPages": 35,
     "maxDetails": 40
   },
-
   "jobrack": {
-    "categories": ["support", "executive-assistant", "sales-marketing"],
+    "categories": [ "support", "executive-assistant", "sales-marketing" ],
     "maxPages": 2,
     "listPages": 3,
     "maxDetails": 30
@@ -61,30 +80,89 @@
     "location": "Serbia",
     "maxPages": 2,
     "maxDetails": 60,
-    "queries": [
-      "customer support", "customer service", "chat support", "korisnička podrška",
-      "virtual assistant", "administrative assistant", "administrativni asistent",
-      "real estate assistant", "property management assistant", "reservation agent", "booking assistant",
-      "ecommerce assistant", "order processing", "data entry", "product listing",
-      "serbian", "serbian speaking", "part time"
-    ]
+    "queries": [ "customer support", "customer service", "chat support", "korisnička podrška", "virtual assistant", "administrative assistant", "administrativni asistent", "real estate assistant", "property management assistant", "reservation agent", "booking assistant", "ecommerce assistant", "order processing", "data entry", "product listing", "serbian", "serbian speaking", "part time" ]
   },
   "wwr": {
-    "feeds": ["remote-customer-support-jobs", "remote-sales-and-marketing-jobs", "all-other-remote-jobs", "remote-management-and-finance-jobs"]
+    "feeds": [ "remote-customer-support-jobs", "remote-sales-and-marketing-jobs", "all-other-remote-jobs", "remote-management-and-finance-jobs" ]
   },
   "himalayas": {
     "country": "RS",
     "maxPages": 2,
-    "queries": ["serbian", "customer support", "virtual assistant", "data entry", "administrative assistant", "part time"]
+    "queries": [ "serbian", "customer support", "virtual assistant", "data entry", "administrative assistant", "part time" ]
   },
   "jooble": {
     "apiKey": "",
     "location": "Srbija",
-    "queries": ["korisnička podrška", "administrativni asistent", "rad od kuće", "unos podataka", "customer support serbian"]
+    "queries": [ "korisnička podrška", "administrativni asistent", "rad od kuće", "unos podataka", "customer support serbian" ]
   },
-  "blockedCompanies": ["nedeljkovic anica"],
+  "pagewatch": {
+    "maxRequests": 30,
+    "extraPages": [
+      {
+        "key": "partners-orka",
+        "company": "Partners&Orka",
+        "listUrl": "http://partners-orka.co.rs/category/aktuelni-poslovi/",
+        "listStart": "id=\"blog\"",
+        "listEnd": "class=\"footer_wrapper\"|<footer",
+        "linkPattern": "^https?://partners-orka\\.co\\.rs/20\\d\\d/\\d\\d/\\d\\d/[^/?#]+/?$",
+        "contentStart": "class=\"blog-content\"",
+        "contentEnd": "class=\"post_paginated\"|<footer",
+        "tags": [ "Agencija" ]
+      },
+      {
+        "key": "ipsos-hr-cati",
+        "company": "Ipsos Hrvatska (Split)",
+        "location": "Hrvatska (CATI od kuće)",
+        "url": "https://www.ipsos.com/hr-hr/vanjski-suradnici-anketari",
+        "title": "Telefonski anketar – rad od kuće (honorarno, pogodno i za penzionere)",
+        "remote": "remote",
+        "employment": [ "freelance" ],
+        "mustMatch": "(?=[\\s\\S]*honorar)(?=[\\s\\S]*(od kuce|vlastitog doma))",
+        "contentStart": "class=\"block-wysiwyg",
+        "contentEnd": "class=\"block-contact|</main>",
+        "tags": [ "Rad od kuće", "Honorarni posao", "Telefonsko anketiranje", "Hrvatska – pitati da li primaju iz Srbije" ]
+      },
+      {
+        "key": "ipsos-hr",
+        "company": "Ipsos Hrvatska",
+        "location": "Hrvatska",
+        "listUrl": "https://www.ipsos.com/hr-hr/radna-mjesta",
+        "listStart": "class=\"block-wysiwyg",
+        "listEnd": "</main>",
+        "linkPattern": "^https://www\\.ipsos\\.com/hr-hr/[^/?#]+$",
+        "contentStart": "class=\"block-wysiwyg",
+        "contentEnd": "class=\"block-contact|</main>"
+      },
+      {
+        "key": "ipsos-ba",
+        "company": "Ipsos BiH",
+        "location": "BiH",
+        "listUrl": "https://www.ipsos.com/bs-ba/radna-mjesta",
+        "listStart": "class=\"block-wysiwyg",
+        "listEnd": "</main>",
+        "linkPattern": "^https://www\\.ipsos\\.com/bs-ba/(?!radna-mjesta$)[^/?#]+$",
+        "contentStart": "class=\"block-wysiwyg",
+        "contentEnd": "class=\"block-contact|</main>"
+      }
+    ]
+  },
+  "blockedCompanies": [ "nedeljkovic anica" ],
   "fx": {
-    "EUR": 1, "USD": 0.88, "GBP": 1.16, "CHF": 1.06, "CAD": 0.63, "AUD": 0.57, "RSD": 0.0085,
-    "PLN": 0.235, "SEK": 0.09, "NOK": 0.086, "DKK": 0.134, "CZK": 0.04, "RON": 0.2, "HUF": 0.0025, "BAM": 0.51, "INR": 0.0102
+    "EUR": 1,
+    "USD": 0.88,
+    "GBP": 1.16,
+    "CHF": 1.06,
+    "CAD": 0.63,
+    "AUD": 0.57,
+    "RSD": 0.0085,
+    "PLN": 0.235,
+    "SEK": 0.09,
+    "NOK": 0.086,
+    "DKK": 0.134,
+    "CZK": 0.04,
+    "RON": 0.2,
+    "HUF": 0.0025,
+    "BAM": 0.51,
+    "INR": 0.0102
   }
 }

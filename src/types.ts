@@ -1,6 +1,6 @@
 export type Source =
   | "infostud" | "startuj" | "poslovirs" | "halooglasi" | "nsz" | "jobrack" | "linkedin" | "wwr" | "himalayas" | "jooble"
-  | "kp" | "pagewatch" | "klikdoposla" | "lalafo" | "olxba" | "sljaka" | "oglaszaposao";
+  | "kp" | "pagewatch" | "klikdoposla" | "lalafo" | "olxba" | "sljaka" | "oglaszaposao" | "honorarci";
 export type Status = "new" | "favorite" | "applied" | "rejected";
 export type SalaryPeriod = "year" | "month" | "week" | "day" | "hour";
 export type RemoteType = "remote" | "hybrid" | "onsite" | "unknown";
@@ -108,6 +108,7 @@ export interface Rules {
   hardGates?: { remote: boolean; partTime: boolean; hybridBelgradePartTime: boolean };
   categoryRequired?: boolean;   // false = oglas bez ciljane kategorije dobija noCategoryScore umesto tvrdog odbijanja
   noCategoryScore?: number;
+  shortText?: { minChars: number; score: number };   // opis kraći od minChars -> score
   categories: Array<{ id: string; label: string; weight: number; patterns: string[] }>;
   language: {
     serbianRequired: string[]; serbianRequiredScore: number;

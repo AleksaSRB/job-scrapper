@@ -1,4 +1,4 @@
-# Izvori — šta se čita i kako (stanje 27.09.2026)
+# Izvori — šta se čita i kako (stanje 28.09.2026)
 
 Scraper traži oglase koji prolaze **tri tvrda uslova** (`rules.json → hardGates` + `language.requireSerbianAd`):
 
@@ -18,12 +18,13 @@ podešavanja su u `DEFAULTS` na vrhu fajla i mogu se pregaziti u `config.json` p
 | 3 | **Halooglasi — Posao** (`halooglasi`) | `posao-pretraga?u_poslednjih_h=<h>&page=N` → `serverListData` (Cloudflare → curl.exe); detalj `CurrentClassified` | cela lista za period; **„Rad od kuće“ kao vrsta zaposlenja** (`vrsta_zaposlenja_s`) = remote, `radno_vreme_s` = puno/nepuno | ~11 + ≤ 40 detalja | 30 min |
 | 4 | **NSZ** (`nsz`) | `nsz.gov.rs/employee/jobs/search?page=N` (najnoviji prvi); detalj `/employee/jobs/preview/<id>` | nema filtera za remote/radno vreme (`search_term` sajt ignoriše) → čita se od najnovijeg dok ne naiđe strana bez neviđenih; naslovi koje ocena ionako obara (IT, medicina, fizički) bez detalja; ostali u red za detalje (≤ 40 po prolazu, ostatak sledeći put) | 1–35 + ≤ 40 | 30 min |
 | 5 | **KupujemProdajem — Poslovi** (`kp`) | `pretraga?categoryId=2546&order=posted desc&page=N` → `initialReduxState.search`; detalj `adUrl` → `ad.byId[id].description` | lista od najnovijeg; pri zaostatku i pretraga opisa po rečima (od kuće, online, honorarno, fleksibilno, pola radnog…) za prioritet; grupe fizičkih poslova bez detalja; **≤ 25 detalja** jer sajt posle ~33 uključi „areYouHuman“ (tada izvor staje za taj prolaz) | 1–2 (+ ≤ 25) | 60 min |
-| 6 | **Sajtovi firmi** (`pagewatch`) | stalne stranice bez datuma: **Ipsos** CATI anketar rad od kuće + spisak `/sr-rs/radna-mesta`, **Open Source** `ponuda-poslova-sr.php`, **Faktor Plus** `zaposlenje-2`, **MASMI** `/karijera/` | jedna stranica = jedan oglas (`pagewatch:<key>`); novi linkovi sa spiskova postaju oglasi; remote/honorarno u konfiguraciji samo kad to piše na stranici (`mustMatch`) | ≤ 10 | 12 h |
+| 6 | **Sajtovi firmi** (`pagewatch`) | stalne stranice bez datuma: **Ipsos Srbija** CATI anketar rad od kuće + spisak `/sr-rs/radna-mesta`, **Open Source** `ponuda-poslova-sr.php`, **Faktor Plus** `zaposlenje-2`, **MASMI** `/karijera/`; iz `config.json → pagewatch.extraPages` (28.09): **Ipsos Hrvatska** CATI od kuće (`/hr-hr/vanjski-suradnici-anketari`, „posebno pogodno za umirovljenike“) + spiskovi Ipsos HR / BiH, **Partners&Orka** (agencija za zapošljavanje, WordPress spisak `/category/aktuelni-poslovi/`) | jedna stranica = jedan oglas (`pagewatch:<key>`); novi linkovi sa spiskova postaju oglasi; remote/honorarno u konfiguraciji samo kad to piše na stranici (`mustMatch`); oglas „samo na teritoriji CG/BiH/HR“ obara `location.exclude` | ≤ 30 | 12 h |
 | 7 | **KlikDoPosla** (`klikdoposla`) | javni feed `klikdoposla.com/ai/jobs.json?page=N` (75/strani, ~230 oglasa) | `employment_type` (Honorarni/Dopunski/…) i `working_model` iz feeda; pun tekst sa stranice oglasa samo za kandidate | 1–4 + ≤ 25 | 2 h |
 | 8 | **Lalafo** (`lalafo`) | `lalafo.rs/api/search/v3/feed/search?category_id=2109` (zaglavlja `country-id: 11`, `device: pc`, `language: sr_RS`) | cela kategorija (~174), pun opis u listi; detalj (params: radno vreme, uzrast) samo za „od kuće / online“ kandidate | ~4 | 2 h |
 | 9 | **OLX.ba — Poslovi** (`olxba`) | `olx.ba/api/search?category_id=2286&page=N`; detalj `/api/listings/<id>` | BiH oglasi na BHS; atributi `vrsta-zaposlenja` (Honorarni posao), `radno-vrijeme` (Pola radnog vremena / Fleksibilno), plata u KM; rad od kuće iz teksta; ≤ 40 detalja (ostatak sledeći put) | ~5–45 | 3 h |
 | 10 | **Šljaka** (`sljaka`) | WordPress RSS `sljaka.com/poslovi/feed/?paged=N` (pun tekst u `content:encoded`) | `job:type`: Pola radnog vremena → part-time, Freelance / Ugovor o delu → honorarno, Rad od kuće (remote) → remote | 1–10 | 6 h |
 | 11 | **OglasZaPosao** (`oglaszaposao`) | WP REST `oglaszaposao.rs/wp-json/wp/v2/oglas?search=<reč>&after=<datum>` — ogledalo **Jooble**-a bez Cloudflare-a | 9 reči (od kuće, na daljinu, remote, online, honorar, nepuno, part time, pola radnog, fleksibiln), poslednje ~3 nedelje; tekst je samo Jooble isečak (~300 znakova) | ~9 + ≤ 15 | 6 h |
+| 13 | **Honorarci.rs** (`honorarci`) | JSON API `honorarci.rs/api/ads?category=ponuda-poslova` + detalj `/api/ads/<id>` | polje `worksOnline` = remote; ostatak sajta su ponude usluga, a osobe koje traže posao obara pravilo „osoba traži posao“ | ~2–8 | 6 h |
 | 12 | **LinkedIn** (`linkedin`) | guest API `jobs-guest/jobs/api/seeMoreJobPostings/search?location=Serbia&f_WT=2&f_TPR=…`; detalj `jobPosting/<id>` | `f_WT=2` „curi“ (vraća i rad iz radnje), pa je remote samo kad tekst kaže; pauze 1,2–1,5 s, 429 prekida izvor | ~20–40 + ≤ 60 | 60 min |
 
 ### Šta je proba pokazala (dry-run 27.09.2026, `npm run try`)
@@ -35,7 +36,8 @@ podešavanja su u `DEFAULTS` na vrhu fajla i mogu se pregaziti u `config.json` p
 | Halooglasi | 210 | 0 | 0 | skoro sve fizički poslovi |
 | NSZ | 560 | 0 | 0 | 0 remote u 10 dana |
 | KupujemProdajem | 515 aktivnih (30 dana) | 3 | 2 | „Call operater – rad od kuće“ (fleksibilno, godine nisu bitne), „Saradnik za javne nabavke (part-time)“ |
-| Sajtovi firmi | 4 stranice | 2 | 2 | **Ipsos CATI anketar od kuće** (penzioneri dobrodošli, bez gornje granice godina), **Open Source** CATI |
+| Sajtovi firmi | 12 stranica/linkova | 3 | 3 | **Ipsos CATI anketar od kuće** (penzioneri dobrodošli, bez gornje granice godina), **Open Source** CATI, **Ipsos Hrvatska** CATI od kuće (pitati da li primaju iz Srbije: 021/430-414) |
+| Honorarci.rs | 7 | 1 | 0 | jedini „online“ oglas je osoba koja traži posao |
 | KlikDoPosla | 230 | 0 | 0 | |
 | Lalafo | 174 | 0 u 30 dana | 0 | remote oglasi su skoro svi MLM |
 | OLX.ba | 306 | 7 (30 dana) | ≤ 5 | većinom MLM — nova MLM pravila ih obaraju |
@@ -66,7 +68,7 @@ velikim oglasnicima nego na **KupujemProdajem** (mali poslodavci) i na **stalnim
 | Careerjet | uglavnom preneti Infostud/HelloWorld oglasi |
 | moj-posao.net, posao.hr (HR), posao.ba (SPA), zaposlime.me (ne postoji) | skoro bez remote oglasa; hrvatski poslovi traže boravak u HR |
 | Njuškalo | ShieldSquare captcha |
-| Mojtrg.rs, Pazar3.me, Oglasi.me | kategorija „rad od kuće“ puna traženja posla i MLM-a; datumi bez godine |
+| Mojtrg.rs, Pazar3.me, Oglasi.me | kategorija „rad od kuće“ puna traženja posla i MLM-a; datumi bez godine; poslednji pravi oglas u Mojtrg „Rad od kuće“ 07.08.2026 |
 | oglasi.rs, malioglasi, bgoglasi, besplatnioglasi, nefertiti, sasomange (ugašen), oglasiposao.in.rs, brzodoposla | mali, zastareli ili samo fizički poslovi |
 | honorarci.rs, dodatniposao.com, freelanceposlovi.com, onlineposao.rs | ljudi nude usluge, nema ponuda posla |
 | studentskiposlovi.rs, omladinske zadruge | starosna granica (~15–30 godina) |
@@ -75,6 +77,16 @@ velikim oglasnicima nego na **KupujemProdajem** (mali poslodavci) i na **stalnim
 | lakodoposla.com, HelloWorld | već u NSZ / Infostud bazi |
 | Joberty, Upwork, rs.indeed.com, jobs.rs, posao.rs, mojposao.rs, bestjobs.rs, zaposlenje.org | SPA / Cloudflare / ne postoje |
 
+### Karijere firmi (28.09.2026)
+
+Provereni sopstveni sajtovi/karijere poslodavaca koji su ranije objavljivali remote oglase na srpskom (iz `data/filtered.log`): **većina nema
+svoju stranicu sa oglasima** i objavljuje samo na Infostud-u / Poslovi.rs / KP-u (koje već čitamo) — Hemoterm, WhiteCitySoft („coming soon“),
+Dumago/Omega, Golden Dream, We Connect 013, Find Staff, Scales, ACBOOST, Allyant, Thrive Talent, Areniq/Kolosseum, Nsourcing 4 you, Fun Solutions,
+Friendly HR i Balkan Bet (sadržaj samo kroz JS), Agency Brilliant (samo forma), Digital Dot i CreaWizz (404). Na engleskom ili sa stranim jezikom:
+Globalkom, Silver Bell (Zoho Recruit), CCBill, Transcom (careers.transcom.com – za Srbiju samo strani jezik; ima interni JSON API ako zatreba),
+Gevekom (nemački), 5CA, Sutherland, TELUS, Hudson Edge, Alpha Staffing. Ipsos Crna Gora ima isti CATI poziv, ali samo za teritoriju Crne Gore.
+Agencija Spektar (agencijaspektar.com, „Honorarni posao – Anketar“) – React sajt sa neispravnim TLS sertifikatom. RZS javni pozivi za anketare – teren.
+
 Kandidati za ručno praćenje (nema oglasa za automatsko čitanje): **MASMI** prijava anketara (`masmi.rs/prijava-anketara/`),
 **Faktor Plus** anketari (pitati telefonom da li ima CATI od kuće), **Adverto Metrics** tajni kupac (honorarno, ali na terenu).
 
@@ -82,5 +94,6 @@ Kandidati za ručno praćenje (nema oglasa za automatsko čitanje): **MASMI** pr
 
 1. `src/sources/<id>.ts` sa `export async function search(ctx: SearchCtx): Promise<Job[]>` (uzor: `nsz.ts`, `kp.ts`, `klikdoposla.ts`).
 2. `npm run try -- <id> --days 30` dok brojke ne izgledaju razumno.
+   Za stranicu firme nije potreban kod: dovoljno je dodati unos u `config.json → pagewatch.extraPages` (format je opisan na vrhu `src/sources/pagewatch.ts`).
 3. Dodati `<id>` u `SOURCES` u `src/scrape.ts`, u `Source` u `src/types.ts`, u `SRC` u `public/index.html` i `"<id>": { "enabled": true, "everyMin": … }` u `config.json → sources`.
 4. Red u ovu tabelu.

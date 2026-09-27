@@ -59,7 +59,8 @@ Oglas bez ijedne ciljane kategorije više nije tvrdo odbijen (27.09.2026, `categ
 −80 iz firme · −60 senior/manager/director (osim „asistent direktora“) ·
 −40 nevezana oblast (klinički, logistika, finansije, marketing…) · −50 samo provizija · −40 noćna/US smena · −40 hladni pozivi ·
 **−100 MLM / piramida / sumnjiv oglas** (Limes, Farmasi, Avon, forex, video chat 18+, „napiši DA u komentar“…) · −40 samo Telegram / dropshipping ·
-**−80 starosna granica / omladinska zadruga** („Uzrast 18–29“, „do 30 godina“) · −30 „poslovi za mlade“ · −80 volontiranje.
+**−80 starosna granica / omladinska zadruga** („Uzrast 18–29“, „do 30 godina“) · −30 „poslovi za mlade“ · −80 volontiranje ·
+−100 osoba koja traži posao („tražim honorarni angažman“) · −40 oglas bez opisa · −40 „detalji samo u poruci“.
 Kategorija „Anketiranje / istraživanje“ (+25) pokriva telefonske anketare od kuće (Ipsos, Open Source).
 Da se full-time oglasi opet vide kao „Moguć match“, vrati `rules.json → employment.fullTimeScore` na −40 i pokreni `npm run score -- --rescore`.
 
@@ -77,10 +78,10 @@ Ceo spisak sa načinom čitanja, filterima i brojem zahteva: **[SOURCE.md](SOURC
 | Halooglasi (Posao) | cela lista za period (Cloudflare → curl); „Rad od kuće“ kao vrsta zaposlenja | 30 min |
 | NSZ | lista od najnovijeg do već viđenih + red za detalje (radno vreme, mesto, jezik) | 30 min |
 | KupujemProdajem (Poslovi) | lista od najnovijeg + detalj (≤ 25 po prolazu zbog anti-bota) | 60 min |
-| Sajtovi firmi (pagewatch) | stalni pozivi za telefonske anketare od kuće: Ipsos, Open Source, Faktor Plus, MASMI | 12 h |
+| Sajtovi firmi (pagewatch) | stalni pozivi za telefonske anketare od kuće: Ipsos (RS, HR, BiH), Open Source, Faktor Plus, MASMI; spisak oglasa agencije Partners&Orka; nove stranice se dodaju u `config.json → pagewatch.extraPages` | 12 h |
 | KlikDoPosla | javni JSON feed `/ai/jobs.json` | 2 h |
 | Lalafo, OLX.ba | JSON API kategorije poslova (OLX.ba = BiH, BHS) | 2 h / 3 h |
-| Šljaka, OglasZaPosao (Jooble ogledalo) | WordPress RSS / REST pretraga | 6 h |
+| Šljaka, OglasZaPosao (Jooble ogledalo), Honorarci.rs | WordPress RSS / REST pretraga / JSON API | 6 h |
 | LinkedIn | guest API, `location=Serbia`; remote samo kad tekst kaže | 60 min |
 | Startuj | ❌ isključen 27.09.2026: ista baza kao Infostud | – |
 | JobRack, WWR, Himalayas, Jooble | ❌ isključeni (samo engleski / Cloudflare) | – |

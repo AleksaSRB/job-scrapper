@@ -147,7 +147,7 @@
     "hybridText": [ "delimicn\\w* (rad\\w* )?od kuce", "povremen\\w* dolas\\w*", "\\bhibridn\\w*", "\\bhybrid\\b", "kombinovan\\w* (rad|model)" ]
   },
   "location": {
-    "exclude": [ "\\b(us|usa|u\\.s\\.|united states|uk|united kingdom|canada|australia|philippines|india|latam|latin america|mexico|colombia|argentina|brazil|pakistan|nigeria|kenya|egypt|south africa)[- ]?(only|based only|residents only|candidates only|applicants only)\\b", "only (open to|for|accepting)[^.\\n]{0,30}\\b(us|usa|united states|uk|canada|australia|philippines|india|latam|eu|european union)\\b", "must (reside|live|be located|be based|be residing) in (the )?(us|usa|u\\.s\\.|united states|uk|united kingdom|canada|australia|germany|eu\\b|european union|philippines|india|latam|latin america|mexico|south africa|pakistan)", "(us|u\\.s\\.|uk|eu|canadian|australian) (work )?(authorization|authorisation|citizen|permanent resident|green card)", "authori[sz]ed to work in (the )?(us|usa|united states|uk|eu|canada|australia)", "eu (citizenship|passport|residen|work permit)", "(citizenship|residency) (in|of) the (eu|european union)", "right to work in (the )?(uk|eu|us|usa)", "(based|located|residing) in (the )?(us|usa|united states|uk|united kingdom|philippines|india|latam|latin america|mexico|pakistan) (only|is required|required)", "\\b(w2|w-2)\\b", "\\b(us|usa|uk) time ?zone only", "\\brelocation (is )?required", "uslov\\w*[^.\\n]{0,60}(bosn\\w* i h[ae]rcegovin|podrucj\\w* (bih|bosne|federacij|republike srpske))", "(prebivalist|boravist)\\w*[^.\\n]{0,30}(\\bbih\\b|bosn|hrvatsk|crn\\w* gor)" ],
+    "exclude": [ "\\b(us|usa|u\\.s\\.|united states|uk|united kingdom|canada|australia|philippines|india|latam|latin america|mexico|colombia|argentina|brazil|pakistan|nigeria|kenya|egypt|south africa)[- ]?(only|based only|residents only|candidates only|applicants only)\\b", "only (open to|for|accepting)[^.\\n]{0,30}\\b(us|usa|united states|uk|canada|australia|philippines|india|latam|eu|european union)\\b", "must (reside|live|be located|be based|be residing) in (the )?(us|usa|u\\.s\\.|united states|uk|united kingdom|canada|australia|germany|eu\\b|european union|philippines|india|latam|latin america|mexico|south africa|pakistan)", "(us|u\\.s\\.|uk|eu|canadian|australian) (work )?(authorization|authorisation|citizen|permanent resident|green card)", "authori[sz]ed to work in (the )?(us|usa|united states|uk|eu|canada|australia)", "eu (citizenship|passport|residen|work permit)", "(citizenship|residency) (in|of) the (eu|european union)", "right to work in (the )?(uk|eu|us|usa)", "(based|located|residing) in (the )?(us|usa|united states|uk|united kingdom|philippines|india|latam|latin america|mexico|pakistan) (only|is required|required)", "\\b(w2|w-2)\\b", "\\b(us|usa|uk) time ?zone only", "\\brelocation (is )?required", "uslov\\w*[^.\\n]{0,60}(bosn\\w* i h[ae]rcegovin|podrucj\\w* (bih|bosne|federacij|republike srpske))", "(prebivalist|boravist)\\w*[^.\\n]{0,30}(\\bbih\\b|bosn|hrvatsk|crn\\w* gor)", "(bilo gd(j)?e )?na (celoj |cijeloj )?teritorij\\w* (crne gore|bosne|bih|federacij\\w* bih|republike srpske|hrvatske|republike hrvatske)" ],
     "excludeScore": -100,
     "include": [ "\\bserbia\\b", "srbij", "\\bbalkan", "eastern europe", "south[- ]?east(ern)? europe", "\\bsee region\\b", "\\bworldwide\\b", "\\banywhere\\b", "\\bglobal(ly)?\\b", "\\bemea\\b", "\\bcet\\b", "\\bcest\\b", "\\beurope\\b", "\\beu\\b", "beograd", "belgrade", "novi sad", "\\bnis\\b", "kragujevac", "\\bsvi gradovi\\b" ],
     "includeScore": 10
@@ -232,6 +232,11 @@
         "patterns": [ "telegram", "dropshipp?ing", "dropsiping", "zarada po ucinku", "neograniceno zarad", "zaradite (i )?do \\d" ]
       },
       {
+        "label": "nejasan oglas: detalji samo u poruci",
+        "score": -40,
+        "patterns": [ "posaljite (nam |mi )?poruku za (vise |sve )?(informacij|detalj)", "detalj\\w* (dobijate|saljem|saznajte|u) (u )?(privatn|inbox|poruc)", "javite se u (inbox|privatn)", "vise informacija u (poruci|inbox|privatn)", "volja za zaradom", "pisite (mi|nam) (u )?(inbox|privatn)" ]
+      },
+      {
         "label": "starosna granica / omladinska zadruga",
         "score": -80,
         "patterns": [ "omladinsk\\w* zadru(g|z)", "studentsk\\w* zadru(g|z)", "uzrast:? ?\\d{2} ?[-–] ?[1-5]\\d\\b", "(do|ispod|mladj\\w* od) (2\\d|3\\d|4\\d|5\\d) godina", "starost\\w* do (2\\d|3\\d|4\\d|5\\d)", "posao preko zadruge", "omladinci za", "clan\\w* omladinsk", "studenti i ucenici", "\\bstudent(i|e|ima)? (i |ili )?(ucenic|srednjoskol)" ]
@@ -245,6 +250,11 @@
         "label": "traži se fakultet iz nevezane oblasti",
         "score": -20,
         "patterns": [ "(bachelor|master|degree|diplom\\w*) (in|iz) (computer|engineering|finance|accounting|law|medic|nursing|pharma|economics|mathematics|statistics|informatik|masinstv|elektrotehni|pravn|medicin|farmac|ekonomij|matemat)" ]
+      },
+      {
+        "label": "osoba traži posao (tekst u prvom licu)",
+        "score": -100,
+        "patterns": [ "\\btrazim (dodatn\\w* |honorarn\\w* |stalan |bilo kakav )*(posao|angazman|zaposlenj)", "\\bdostupn[ao] sam (za|od)\\b", "\\bzaposlen[ao]? sam u oblasti\\b", "\\bnudim (svoje )?usluge\\b" ]
       }
     ]
   },
@@ -273,5 +283,10 @@
       "score": 10,
       "patterns": [ "\\bserbia\\b", "srbij", "\\bbalkan", "eastern europe", "worldwide", "\\banywhere\\b" ]
     }
-  ]
+  ],
+  "_shortTextComment": "27.09.2026: oglas skoro bez opisa (npr. OLX „Posao – šijem nameštaj od kuće“ bez teksta) ne sme da prođe samo na naslovu.",
+  "shortText": {
+    "minChars": 40,
+    "score": -40
+  }
 }

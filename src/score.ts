@@ -199,6 +199,11 @@ export function scoreJob(job: Job): Scoring {
   else if (job.locationVerified) add(LOC.includeScore, "sajt već filtrira: dostupno iz Srbije");
   else { const inc = firstMatch(LOC_INCL, `${loc}\n${text}`); if (inc) add(LOC.includeScore, `lokacija ${quote(inc[0])}`); }
 
+  // ---- oglas skoro bez opisa (samo naslov) – na oglasnicima je to najčešće ponuda usluge ili mamac „pišite u poruku“
+  const ST = RULES.shortText;
+  const bodyLen = `${job.description ?? ""} ${job.summary ?? ""}`.replace(/\s+/g, " ").trim().length;
+  if (ST && bodyLen < ST.minChars) add(ST.score, `oglas bez opisa (${bodyLen} znakova)`);
+
   // ---- ostali negativi u tekstu
   for (const g of NEG_TEXT) { const m = firstMatch(g.re, text); if (m) add(g.score, `${g.label} ${quote(m[0])}`); }
 
