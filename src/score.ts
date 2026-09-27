@@ -21,6 +21,7 @@ const PART_TIME = compile(E.partTime, "employment.partTime");
 const FULL_TIME_TXT = compile(E.fullTimeText ?? [], "employment.fullTimeText");
 const PART_TIME_TITLE = compile(E.partTimeTitle ?? [], "employment.partTimeTitle");
 const REMOTE_TXT = compile(E.remoteText, "employment.remoteText");
+const HYBRID_TXT = compile(E.hybridText ?? [], "employment.hybridText");
 const HYBRID_CITIES = compile(E.hybridCities ?? [], "employment.hybridCities");
 const ONSITE_TXT = compile(E.onsiteText, "employment.onsiteText");
 const LOC_EXCL = compile(LOC.exclude, "location.exclude");
@@ -28,6 +29,9 @@ const LOC_INCL = compile(LOC.include, "location.include");
 const NEG_TITLE = RULES.negatives.title.map((g) => ({ ...g, re: compile(g.patterns, `negatives.title.${g.label}`) }));
 const NEG_TEXT = RULES.negatives.text.map((g) => ({ ...g, re: compile(g.patterns, `negatives.text.${g.label}`) }));
 const POS = RULES.positives.map((g) => ({ ...g, re: compile(g.patterns, `positives.${g.id}`) }));
+
+/** Bez dijakritika + ćirilica -> latinica + rodni oblici „Agent/ica“, „Operater/ka“, „Savetnik/ca“ -> osnovni oblik (inače `\w*` pravila ne pogađaju). */
+const norm = (s: string | null | undefined) => fold(latinize(s ?? "")).replace(/(\w)\/(ica|ice|ka|ke|ki|kinja|inja|ca|a)\b/g, "$1");
 
 const firstMatch = (res: RegExp[], text: string): RegExpMatchArray | null => { for (const r of res) { const m = text.match(r); if (m) return m; } return null; };
 const quote = (s: string) => `«${s.trim().replace(/\s+/g, " ").slice(0, 60)}»`;
@@ -42,13 +46,19 @@ export const CATEGORY_LABEL: Record<string, string> = Object.fromEntries(RULES.c
 
 /** Naslov pogađa bar jednu kategoriju – parseri po tome biraju za koje (neviđene) oglase vredi skidati detalj. */
 export function titleHasCategory(title: string): boolean {
-  const t = fold(latinize(title));
+  const t = norm(title);
   return CATS.some((c) => c.re.some((r) => r.test(t)));
 }
 
+/** Naslov je tvrdo odbijen (IT, medicina, fizički posao…) -> parser ne mora da skida detalj. */
+export function titleRejected(title: string): boolean {
+  const t = norm(title);
+  return NEG_TITLE.some((g) => g.score <= -100 && g.re.some((r) => r.test(t)));
+}
+
 export function scoreJob(job: Job): Scoring {
-  const title = fold(latinize(job.title));
-  const body = fold(latinize(`${job.description ?? ""}\n${job.summary ?? ""}\n${job.tags.join(" ")}`));
+  const title = norm(job.title);
+  const body = norm(`${job.description ?? ""}\n${job.summary ?? ""}\n${job.tags.join(" ")}`);
   const text = `${title}\n${body}`;
   const loc = fold(latinize(job.location));
   const reasons: string[] = [];
@@ -65,7 +75,10 @@ export function scoreJob(job: Job): Scoring {
     else if (c.re.some((r) => r.test(body))) cats.push({ id: c.id, label: c.label, pts: Math.round(c.weight * 0.6), inTitle: false });
   }
   cats.sort((a, b) => b.pts - a.pts || Number(b.inTitle) - Number(a.inTitle));
-  if (cats.length === 0) hardReject("nijedna ciljana kategorija (podrška / administracija / nekretnine / unos podataka …)");
+  if (cats.length === 0) {
+    if (RULES.categoryRequired ?? true) hardReject("nijedna ciljana kategorija (podrška / administracija / nekretnine / unos podataka …)");
+    else add(RULES.noCategoryScore ?? -20, "nijedna ciljana kategorija (podrška / administracija / nekretnine / unos podataka …)");
+  }
   else {
     add(cats[0].pts, `${cats[0].label}${cats[0].inTitle ? " (naslov)" : " (opis)"}`);
     if (cats.length > 1) add(Math.min(10, 5 * (cats.length - 1)), `još: ${cats.slice(1, 4).map((c) => c.label).join(", ")}`);
@@ -123,7 +136,12 @@ export function scoreJob(job: Job): Scoring {
   const ptMatch = firstMatch(PART_TIME, text);
   let partTime = false;
   if (job.employment.includes("part-time")) { add(E.partTimeScore, "part-time (polje sajta)"); badges.push("Part-time"); partTime = true; }
-  else if (job.employment.includes("freelance") || job.employment.includes("contract")) { add(E.flexibleScore, `${job.employment.includes("freelance") ? "honorarno/freelance" : "ugovor"} (polje sajta)`); badges.push(job.employment.includes("freelance") ? "Honorarno" : "Ugovor"); partTime = true; }
+  else if (job.employment.includes("freelance") || job.employment.includes("contract")) {
+    // "Contract" (LinkedIn) je često ugovor na puno radno vreme -> za tvrdi uslov part-time važi samo uz pominjanje fleksibilnosti u tekstu
+    const freelance = job.employment.includes("freelance");
+    add(E.flexibleScore, `${freelance ? "honorarno/freelance" : "ugovor"} (polje sajta)`); badges.push(freelance ? "Honorarno" : "Ugovor");
+    partTime = freelance || ptMatch !== null;
+  }
   else if (job.employment.includes("full-time")) {
     const ptTitle = firstMatch(PART_TIME_TITLE, title);
     if (ptTitle) {
@@ -144,23 +162,35 @@ export function scoreJob(job: Job): Scoring {
 
   // ---- remote
   let remoteFinal: RemoteType = job.remote;
+  let hybridBelgradePartTime = false;
   if (job.remote === "remote") { add(E.remoteScore, "remote (filter/polje sajta)"); badges.push("Remote"); }
-  else if (job.remote === "hybrid") {
-    // hibrid prolazi samo u Beogradu (hybridCities) I samo ako je part-time; sve ostalo hibridno se sakriva (hybridElsewhereScore)
-    const cityHay = loc || text;
-    const inCity = HYBRID_CITIES.some((r) => r.test(cityHay));
-    if (inCity && partTime) { add(E.hybridScore, `hibrid u Beogradu + part-time ${quote(job.location || "Beograd")}`); badges.push("Hibrid (Beograd)"); }
-    else { add(E.hybridElsewhereScore, inCity ? "hibrid, ali nije part-time" : `hibrid van Beograda ${quote(job.location || "?")}`); badges.push("Hibrid"); }
-  }
   else if (job.remote === "onsite") { add(E.onsiteScore, "rad iz firme (polje sajta)"); badges.push("Iz firme"); }
-  else {
-    const r = firstMatch(REMOTE_TXT, text);
-    if (r) { add(E.remoteScore, `remote ${quote(r[0])}`); badges.push("Remote"); remoteFinal = "remote"; }
+  else if (job.remote === "unknown") {
+    // „delimično od kuće, uz povremene dolaske u kancelariju“ je hibrid, iako sadrži „od kuće“ -> hibrid se proverava pre remote teksta
+    const h = firstMatch(HYBRID_TXT, text);
+    const r = h ? null : firstMatch(REMOTE_TXT, text);
+    if (h) remoteFinal = "hybrid";
+    else if (r) { add(E.remoteScore, `remote ${quote(r[0])}`); badges.push("Remote"); remoteFinal = "remote"; }
     else {
       const o = firstMatch(ONSITE_TXT, text);
       if (o) { add(E.onsiteScore, `rad iz firme ${quote(o[0])}`); badges.push("Iz firme"); remoteFinal = "onsite"; }
       else add(E.unknownRemoteScore, "nejasno da li je remote");
     }
+  }
+  if (remoteFinal === "hybrid") {
+    // hibrid prolazi samo u Beogradu (hybridCities) I samo ako je part-time; sve ostalo hibridno se sakriva (hybridElsewhereScore)
+    const cityHay = loc || text;
+    const inCity = HYBRID_CITIES.some((r) => r.test(cityHay));
+    const how = job.remote === "hybrid" ? "" : " (tekst)";
+    if (inCity && partTime) { add(E.hybridScore, `hibrid${how} u Beogradu + part-time ${quote(job.location || "Beograd")}`); badges.push("Hibrid (Beograd)"); hybridBelgradePartTime = true; }
+    else { add(E.hybridElsewhereScore, inCity ? `hibrid${how}, ali nije part-time` : `hibrid${how} van Beograda ${quote(job.location || "?")}`); badges.push("Hibrid"); }
+  }
+
+  // ---- tvrdi uslovi (rules.json → hardGates, 27.09.2026): remote + part-time; „oglas na srpskom“ je gore (language.requireSerbianAd)
+  const G = RULES.hardGates;
+  if (G?.partTime && !partTime) hardReject("nije part-time / honorarno (ni polje sajta ni tekst ne kažu nepuno/fleksibilno radno vreme)");
+  if (G?.remote && remoteFinal !== "remote" && !(G.hybridBelgradePartTime && hybridBelgradePartTime)) {
+    hardReject(remoteFinal === "hybrid" ? "hibrid, nije rad od kuće" : remoteFinal === "onsite" ? "rad iz firme, nije rad od kuće" : "nigde ne piše da je rad od kuće / remote");
   }
 
   // ---- lokacija

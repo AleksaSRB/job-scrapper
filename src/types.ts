@@ -1,4 +1,6 @@
-export type Source = "infostud" | "startuj" | "poslovirs" | "halooglasi" | "nsz" | "jobrack" | "linkedin" | "wwr" | "himalayas" | "jooble";
+export type Source =
+  | "infostud" | "startuj" | "poslovirs" | "halooglasi" | "nsz" | "jobrack" | "linkedin" | "wwr" | "himalayas" | "jooble"
+  | "kp" | "pagewatch" | "klikdoposla" | "lalafo" | "olxba" | "sljaka" | "oglaszaposao";
 export type Status = "new" | "favorite" | "applied" | "rejected";
 export type SalaryPeriod = "year" | "month" | "week" | "day" | "hour";
 export type RemoteType = "remote" | "hybrid" | "onsite" | "unknown";
@@ -85,11 +87,11 @@ export interface Config {
   minScore: number;
   ntfyTopic: string;
   sources: Record<Source, SourceConfig>;
-  infostud: { maxPages: number; maxDetails: number; queries: string[]; remoteOnlyQueries: string[] };
+  infostud: { maxPages: number; maxDetails: number; sweeps: Array<{ label: string; filters: string; employment?: EmploymentKind[] }> };
   startuj: { paths: string[]; maxPages: number };
   poslovirs: { maxPages: number; maxDetails: number };
   halooglasi: { maxPages: number; maxDetails: number };
-  nsz: { categories: number[]; queries: string[]; maxPages: number; maxDetails: number };
+  nsz: { maxPages: number; maxDetails: number };
   jobrack: { categories: string[]; maxPages: number; listPages: number; maxDetails: number };
   linkedin: { location: string; maxPages: number; maxDetails: number; queries: string[] };
   wwr: { feeds: string[] };
@@ -103,6 +105,9 @@ export interface Config {
 export interface RuleGroup { label: string; score: number; patterns: string[] }
 export interface Rules {
   thresholds: { excellent: number; good: number; possible: number };
+  hardGates?: { remote: boolean; partTime: boolean; hybridBelgradePartTime: boolean };
+  categoryRequired?: boolean;   // false = oglas bez ciljane kategorije dobija noCategoryScore umesto tvrdog odbijanja
+  noCategoryScore?: number;
   categories: Array<{ id: string; label: string; weight: number; patterns: string[] }>;
   language: {
     serbianRequired: string[]; serbianRequiredScore: number;
@@ -114,7 +119,7 @@ export interface Rules {
   };
   employment: {
     partTime: string[]; partTimeTitle: string[]; partTimeScore: number; flexibleScore: number; fullTimeText: string[]; fullTimeScore: number;
-    remoteText: string[]; onsiteText: string[]; remoteScore: number;
+    remoteText: string[]; hybridText?: string[]; onsiteText: string[]; remoteScore: number;
     hybridCities: string[]; hybridScore: number; hybridElsewhereScore: number; // hibrid prolazi samo u ovim gradovima I ako je part-time
     onsiteScore: number; unknownRemoteScore: number;
   };

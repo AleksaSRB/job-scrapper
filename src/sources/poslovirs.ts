@@ -26,7 +26,8 @@ function parseList(html: string): Job[] {
     const id = path.match(/-(\d+)\/?$/)?.[1];
     const title = clean(block.match(/<h4 class="ellipsis-box">([\s\S]*?)<\/h4>/)?.[1]);
     if (!id || !title) continue;
-    const remote = /title="Rad od ku[čc]e"><div class="sticker/.test(block);
+    // svaka kartica ima prazan <span title="Rad od kuće">; remote je samo ona sa RDK stikerom (27.09: stari regex [čc] nije hvatao „ć“)
+    const remote = />\s*RDK\s*</.test(block);
     const logo = block.match(/<img src="([^"]+)"/)?.[1];
     out.push({
       source: "poslovirs", id: `poslovirs:${id}`, url: `${BASE}${path}`, title,

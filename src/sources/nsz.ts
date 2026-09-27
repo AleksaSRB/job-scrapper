@@ -1,19 +1,24 @@
 /**
  * Nacionalna služba za zapošljavanje – zvanični oglasi (provereno 26.09.2026), SSR HTML, ćirilica -> latinizuje se.
- *   lista:  GET https://nsz.gov.rs/employee/jobs/search?search_term=<upit>&page=N   ili  ?category_id[]=<id>&page=N   (20 po strani)
+ *   lista:  GET https://nsz.gov.rs/employee/jobs/search?page=N   (20 po strani, najnoviji prvi; filteri `category_id[]=<id>`, `labor_type_id[]=<id>`)
  *           <div class="single-job …" onclick="…/employee/jobs/preview/<id>"> job-title, job-description (poslodavac + grad), „Оглас истиче: dd.mm.yyyy.“
  *           kategorije (category_id): 20 Администрација, 14 Трговина/комерцијала, 17 Менаџмент, 16 Економија, 24 Култура/медији/ПР,
- *           15 Угоститељство/туризам, 12 Архитектура; `keyword` param ne filtrira – radi `search_term`.
+ *           15 Угоститељство/туризам, 12 Архитектура (vidi napomenu od 27.09 ispod: `search_term` ne filtrira).
  *   detalj: GET https://nsz.gov.rs/employee/jobs/preview/<id>  -> .job-content (opis), .job-location (grupa - grad), .job-requirements tabela:
  *           „Временско трајање огласа: 25.09.2026. - 25.10.2026.“ (prvi datum = objava), „Врста рада“, „Радно време“, „Место рада“,
  *           „Радно искуство“, „Рад на рачунару“, „Језик: Енглески: … Почетни(A1) … Обавезно“ (nivo jezika = zlato za filter engleskog).
  * NSZ agregira i oglase sa Infostud-a i Lako do posla -> duplikati se spajaju po firmi+naslovu.
  * Nema polja za rad od kuće -> tekst; bez pominjanja = iz firme.
+ * 27.09.2026: `search_term` se IGNORIŠE (svaki upit vraća istu nefiltriranu prvu stranu), `keyword` radi samo ćirilicom i samo po naslovu,
+ * a filtera za rad od kuće / radno vreme nema. Lista je poređana od najnovijeg (po id-ju) -> čitaju se strane `?page=N` dok ne naiđe strana
+ * bez neviđenih oglasa (prvi prolaz ~30 strana, kasnije 1–2). Detalj je jedini izvor za remote/radno vreme, pa: oglas kome naslov već
+ * obara ocenu (IT, medicina, fizički posao) se vraća bez detalja; ostali idu u red – najviše maxDetails po prolazu, a oni koji nisu stigli
+ * se NE vraćaju (ostaju neviđeni i skidaju se sledeći put).
  */
 import { CONFIG } from "../config.ts";
 import { dateSrToIso, decodeEntities, fetchText, htmlToText, sleep, truncate } from "../http.ts";
 import { salaryFromDescription } from "../salary.ts";
-import { titleHasCategory } from "../score.ts";
+import { titleHasCategory, titleRejected } from "../score.ts";
 import { latinize } from "../text.ts";
 import type { EmploymentKind, Job, SearchCtx } from "../types.ts";
 
@@ -75,27 +80,31 @@ async function enrich(job: Job): Promise<void> {
 }
 
 export async function search(ctx: SearchCtx): Promise<Job[]> {
-  const { categories, queries, maxPages, maxDetails } = CONFIG.nsz;
+  const { maxPages, maxDetails } = CONFIG.nsz;
   const found = new Map<string, Job>();
-  const plan = [...categories.map((c) => ({ label: `kat ${c}`, qs: `category_id%5B%5D=${c}` })), ...queries.map((q) => ({ label: `q="${q}"`, qs: `search_term=${encodeURIComponent(q)}` }))];
-  for (const p of plan) {
-    for (let page = 1; page <= maxPages; page++) {
-      const jobs = parseList(await fetchText(`${BASE}/employee/jobs/search?${p.qs}&page=${page}`));
-      let added = 0;
-      for (const j of jobs) if (!found.has(j.id)) { found.set(j.id, j); added++; }
-      ctx.log(`[nsz] ${p.label} page=${page} results=${jobs.length} novih_u_listi=${added}`);
-      await sleep(500);
-      if (jobs.length < PAGE_SIZE || added === 0) break;
-    }
+  for (let page = 1; page <= maxPages; page++) {
+    const jobs = parseList(await fetchText(`${BASE}/employee/jobs/search?page=${page}`));
+    let unseen = 0;
+    for (const j of jobs) if (!found.has(j.id)) { found.set(j.id, j); if (!ctx.isSeen(j.id)) unseen++; }
+    ctx.log(`[nsz] page=${page} results=${jobs.length} neviđenih=${unseen}`);
+    await sleep(500);
+    if (jobs.length < PAGE_SIZE || unseen === 0) break;
   }
-  let details = 0;
+  const out: Job[] = [];
+  const queue: Job[] = [];
   for (const j of found.values()) {
-    if (ctx.isSeen(j.id) || details >= maxDetails) continue;
-    if (!titleHasCategory(j.title) && j.remote !== "remote") continue;
+    if (ctx.isSeen(j.id) || titleRejected(j.title)) out.push(j); // viđen (osveži lastSeen) ili ga naslov ionako obara
+    else queue.push(j);
+  }
+  // prvo remote u naslovu, pa ciljana kategorija, pa ostali
+  const prio = (j: Job) => (j.remote === "remote" ? 0 : titleHasCategory(j.title) ? 1 : 2);
+  queue.sort((a, b) => prio(a) - prio(b));
+  let details = 0;
+  for (const j of queue.slice(0, maxDetails)) {
     details++;
-    try { await enrich(j); } catch (e) { ctx.log(`[nsz] detalj ${j.id}: ${(e as Error).message}`); }
+    try { await enrich(j); out.push(j); } catch (e) { ctx.log(`[nsz] detalj ${j.id}: ${(e as Error).message}`); }
     await sleep(500);
   }
-  ctx.log(`[nsz] ukupno ${found.size} oglasa, ${details} detalja skinuto`);
-  return [...found.values()];
+  ctx.log(`[nsz] ukupno ${found.size} oglasa, ${details} detalja skinuto, ${Math.max(0, queue.length - maxDetails)} čeka sledeći prolaz`);
+  return out;
 }

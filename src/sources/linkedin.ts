@@ -4,6 +4,7 @@
  *           HTML fragment, 10 <li> po strani: data-entity-urn="urn:li:jobPosting:<id>", base-search-card__title, __subtitle (firma),
  *           job-search-card__location, <time datetime="YYYY-MM-DD">, base-card__full-link href, img data-delayed-url (logo)
  *           f_WT=2 = remote, f_JT=P = part-time, f_TPR=r432000 = poslednjih 5 dana
+ *           (27.09.2026: filteri nisu strogi – f_WT=2 vraća i rad iz radnje, pa se remote čita iz teksta; geoId Srbije = 101855366)
  *   detalj: GET https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/<id>  -> description__text, description__job-criteria-text
  *           (Seniority level, Employment type, Job function, Industries)
  * Rizik: rate limit (HTTP 429) posle većeg broja zahteva -> mali broj upita, pauze, detalj samo za neviđene; 429 prekida izvor.
@@ -28,7 +29,9 @@ function parseList(html: string): Job[] {
       company: clean(li.match(/base-search-card__subtitle"[^>]*>([\s\S]*?)<\/h4>/)?.[1]),
       companyLogo: li.match(/data-delayed-url="([^"]+)"/)?.[1]?.replace(/&amp;/g, "&"),
       location: clean(li.match(/job-search-card__location"[^>]*>([\s\S]*?)<\/span>/)?.[1]),
-      remote: "remote", employment: [], locationVerified: true,
+      // 27.09.2026: f_WT=2 filter „curi“ (vraća i oglase iz radnje/kancelarije), a guest API nema polje za način rada ->
+      // "unknown": score.ts traži „remote / rad od kuće“ u naslovu i opisu, bez toga oglas ne prolazi tvrdi uslov
+      remote: "unknown", employment: [], locationVerified: true,
       salary: parseSalaryText(clean(li.match(/job-search-card__salary-info"[^>]*>([\s\S]*?)<\/span>/)?.[1])) ?? undefined,
       postedAt: toIso(li.match(/<time[^>]*datetime="([^"]+)"/)?.[1]),
       tags: [],

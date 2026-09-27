@@ -18,16 +18,6 @@ import { companyBlocked, DedupIndex } from "./dedup.ts";
 import { sleep } from "./http.ts";
 import { fmtSalary, salaryEurMonth } from "./salary.ts";
 import { hideReason, scoreJob } from "./score.ts";
-import * as halooglasi from "./sources/halooglasi.ts";
-import * as himalayas from "./sources/himalayas.ts";
-import * as infostud from "./sources/infostud.ts";
-import * as jobrack from "./sources/jobrack.ts";
-import * as jooble from "./sources/jooble.ts";
-import * as linkedin from "./sources/linkedin.ts";
-import * as nsz from "./sources/nsz.ts";
-import * as poslovirs from "./sources/poslovirs.ts";
-import * as startuj from "./sources/startuj.ts";
-import * as wwr from "./sources/wwr.ts";
 import { CorruptStoreError, loadDb, loadSeen, log, logFiltered, saveDb, saveSeen, toStored, ts } from "./store.ts";
 import type { Job, SearchCtx, Source, StoredJob } from "./types.ts";
 
@@ -35,18 +25,20 @@ const { values: args } = parseArgs({
   options: { force: { type: "boolean", default: false }, loop: { type: "boolean", default: false }, only: { type: "string" } },
 });
 
-const SOURCES: Array<{ name: Source; search: (ctx: SearchCtx) => Promise<Job[]> }> = [
-  { name: "infostud", search: infostud.search },
-  { name: "startuj", search: startuj.search },
-  { name: "poslovirs", search: poslovirs.search },
-  { name: "halooglasi", search: halooglasi.search },
-  { name: "nsz", search: nsz.search },
-  { name: "jobrack", search: jobrack.search },
-  { name: "wwr", search: wwr.search },
-  { name: "himalayas", search: himalayas.search },
-  { name: "linkedin", search: linkedin.search },
-  { name: "jooble", search: jooble.search },
+/**
+ * Redosled čitanja izvora. Svaki izvor je src/sources/<ime>.ts sa `search(ctx)`; učitava se tek kad je uključen i na redu
+ * (dinamički import), pa pokvaren ili nedostajući adapter obori samo svoj red u izveštaju, ne ceo scraper.
+ */
+const SOURCES: Source[] = [
+  "infostud", "startuj", "poslovirs", "halooglasi", "nsz", "kp", "pagewatch", "klikdoposla", "lalafo", "olxba", "sljaka", "oglaszaposao",
+  "jobrack", "wwr", "himalayas", "linkedin", "jooble",
 ];
+
+async function loadSearch(name: Source): Promise<(ctx: SearchCtx) => Promise<Job[]>> {
+  const mod = await import(`./sources/${name}.ts`);
+  if (typeof mod.search !== "function") throw new Error(`src/sources/${name}.ts nema search()`);
+  return mod.search;
+}
 
 const ONLY = args.only ? new Set(args.only.split(",").map((s) => s.trim()).filter(Boolean)) : null;
 
@@ -103,17 +95,19 @@ export async function runOnce(force: boolean): Promise<void> {
     const fresh: StoredJob[] = [];
     const summary: string[] = [];
 
-    for (const src of SOURCES) {
-      const sc = CONFIG.sources[src.name];
-      if (ONLY ? !ONLY.has(src.name) : !sc?.enabled) continue;
-      if (!ONLY && !force && !isDue(start.sources[src.name]?.lastFetched, sc.everyMin)) continue;
+    for (const name of SOURCES) {
+      const src = { name };
+      const sc = CONFIG.sources[name];
+      if (ONLY ? !ONLY.has(name) : !sc?.enabled) continue;
+      if (!ONLY && !force && !isDue(start.sources[name]?.lastFetched, sc?.everyMin ?? 60)) continue;
 
       const batch: StoredJob[] = [];
       const touched = new Map<string, StoredJob>(); // kartice iz baze kojima je promenjen lastSeen / alsoOn / plata
       let line: string;
       const t0 = Date.now();
       try {
-        const items = await src.search({ since, isSeen: (id) => seen.has(id) || id in known, log });
+        const search = await loadSearch(name);
+        const items = await search({ since, isSeen: (id) => seen.has(id) || id in known, log });
         let old = 0, filtered = 0, dupes = 0, blocked = 0;
         const now = new Date().toISOString();
         for (const j of items) {
@@ -170,7 +164,7 @@ export async function runOnce(force: boolean): Promise<void> {
       }
       db.sources[src.name] = { lastFetched: new Date().toISOString(), summary: line };
       db.lastRun = new Date().toISOString();
-      db.lastRunSummary = SOURCES.map((s) => db.sources[s.name]?.summary).filter(Boolean).join(" | ");
+      db.lastRunSummary = SOURCES.map((s) => db.sources[s]?.summary).filter(Boolean).join(" | ");
       saveDb(db);
       saveSeen(seen);
       fresh.push(...batch);

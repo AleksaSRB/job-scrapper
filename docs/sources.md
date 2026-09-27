@@ -58,3 +58,15 @@ Detalj stranice se skidaju samo za oglase koji nisu viđeni ranije (`data/seen.j
 | Himalayas | 88 | 11 → 9 | 24 | 53 | 5 s |
 
 Većina odbijenih sa „ciljanom“ kategorijom pada na: napredni engleski (C1/fluent/„aktivno znanje“), strani jezik u naslovu (nemački/francuski/italijanski – Transcom, TaskUs, NCR), rad iz firme, senior/manager. Razlozi su u `data/filtered.log`.
+
+## Dopuna 27.09.2026 — proširenje izvora i tri tvrda uslova
+
+Tvrdi uslovi: part-time + rad od kuće + oglas na srpskom (`rules.json → hardGates`). Aktuelni spisak svih izvora, filtera i rezultata probe je u
+**[SOURCE.md](../SOURCE.md)** (tamo je i dugačak spisak proverenih i odbačenih sajtova). Ispravke postojećih adaptera istog dana:
+
+- Poslovi.rs: remote se nikad nije prepoznavao (regex `[čc]` nasuprot „ć“ u `title="Rad od kuće"`) → sada sticker `RDK`.
+- Halooglasi: vrsta zaposlenja „Rad od kuće“ (`vrsta_zaposlenja_s` / „radni odnos“ u listi) sada znači remote.
+- NSZ: `search_term` sajt ignoriše (svaki upit = ista prva strana) → lista od najnovijeg + red za detalje.
+- Infostud: upiti bez remote filtera nisu mogli da prođu tvrde uslove → 5 sweep-ova po filterima (~7 zahteva umesto ~45); detalj bez liste sada prepoznaje `location: "Rad od kuće"`.
+- Startuj: „0 oglasa“ nije kvar sajta — svi id-jevi su već viđeni preko Infostud-a → izvor isključen.
+- LinkedIn: `f_WT=2` vraća i rad iz radnje (IKEA, JYSK, Wolt) → remote samo kad tekst kaže.

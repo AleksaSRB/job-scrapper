@@ -27,7 +27,7 @@ const DEFAULTS: Config = {
   ntfyTopic: "",
   sources: {
     infostud: { enabled: true, everyMin: 15 },
-    startuj: { enabled: true, everyMin: 30 },
+    startuj: { enabled: false, everyMin: 30 },   // 27.09.2026: ista baza kao Infostud (sweep „remote + honorarno“ je nadskup)
     poslovirs: { enabled: true, everyMin: 30 },
     halooglasi: { enabled: true, everyMin: 30 },
     nsz: { enabled: true, everyMin: 30 },
@@ -37,11 +37,20 @@ const DEFAULTS: Config = {
     himalayas: { enabled: false, everyMin: 30 }, // 24.09.2026: isključen – i „Serbian“ oglasi tamo traže engleski
     jooble: { enabled: false, everyMin: 60 },
   },
-  infostud: { maxPages: 2, maxDetails: 40, queries: ["korisnička podrška", "administrativni asistent"], remoteOnlyQueries: [] },
+  infostud: {
+    maxPages: 4, maxDetails: 60,
+    sweeps: [
+      { label: "remote + nepuno", filters: "workPlaceTypes=remote&workingHours=5", employment: ["part-time"] },
+      { label: "remote + honorarno", filters: "workPlaceTypes=remote&employmentTypes=9", employment: ["freelance"] },
+      { label: "svi remote", filters: "workPlaceTypes=remote" },
+      { label: "hibrid + nepuno", filters: "workPlaceTypes=hybrid&workingHours=5", employment: ["part-time"] },
+      { label: "hibrid + honorarno", filters: "workPlaceTypes=hybrid&employmentTypes=9", employment: ["freelance"] },
+    ],
+  },
   startuj: { paths: ["/honorarni-poslovi"], maxPages: 1 },
   poslovirs: { maxPages: 8, maxDetails: 30 },
   halooglasi: { maxPages: 15, maxDetails: 40 },
-  nsz: { categories: [20], queries: ["administrativni"], maxPages: 3, maxDetails: 30 },
+  nsz: { maxPages: 35, maxDetails: 40 },
   jobrack: { categories: ["support", "executive-assistant"], maxPages: 1, listPages: 2, maxDetails: 20 },
   linkedin: { location: "Serbia", maxPages: 1, maxDetails: 30, queries: ["customer support"] },
   wwr: { feeds: ["remote-customer-support-jobs"] },
@@ -51,17 +60,19 @@ const DEFAULTS: Config = {
   fx: { EUR: 1, USD: 0.88, RSD: 0.0085 },
 };
 
+const isObj = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
+
+/** config.json preko DEFAULTS; svaki objekat (sources, infostud, nsz, fx…) se spaja po ključevima, pa novi izvor ne traži izmenu ovde. */
 function loadConfig(): Config {
-  let user: Partial<Config> = {};
+  let user: Record<string, unknown> = {};
   try { user = JSON.parse(readFileSync(CONFIG_FILE, "utf8")); } catch { /* koristi default */ }
-  const merge = <K extends keyof Config>(k: K): Config[K] => ({ ...(DEFAULTS[k] as object), ...((user[k] ?? {}) as object) }) as Config[K];
-  return {
-    ...DEFAULTS, ...user,
-    port: Number(process.env.MOM_JOBS_PORT) || user.port || DEFAULTS.port,
-    sources: merge("sources"), infostud: merge("infostud"), startuj: merge("startuj"), poslovirs: merge("poslovirs"), halooglasi: merge("halooglasi"), nsz: merge("nsz"),
-    jobrack: merge("jobrack"), linkedin: merge("linkedin"), wwr: merge("wwr"), himalayas: merge("himalayas"), jooble: merge("jooble"),
-    fx: merge("fx"),
-  };
+  const out: Record<string, unknown> = { ...DEFAULTS, ...user };
+  for (const k of Object.keys(out)) {
+    const d = (DEFAULTS as unknown as Record<string, unknown>)[k];
+    if (isObj(d) && isObj(user[k])) out[k] = { ...d, ...user[k] };
+  }
+  out.port = Number(process.env.MOM_JOBS_PORT) || Number(user.port) || DEFAULTS.port;
+  return out as unknown as Config;
 }
 
 function loadRules(): Rules {

@@ -60,7 +60,7 @@ function fromList(ad: any): Job {
     title: clean(lh.match(/class="courses-title">\s*<a[^>]*>([\s\S]*?)<\/a>/)?.[1]) || String(ad.Title ?? "").trim(),
     company: clean(lh.match(/class="courses-subtitle">([\s\S]*?)<\/div>/)?.[1]),
     location: li("lokacija").replace(/^\(|\)$/g, ""),
-    remote: remoteOf(`${ad.Title ?? ""} ${snippet}`),
+    remote: /rad od ku/i.test(radniOdnos) ? "remote" : remoteOf(`${ad.Title ?? ""} ${snippet}`),
     employment: employmentOf(radniOdnos),
     postedAt: null,
     description: snippet,
@@ -77,15 +77,18 @@ async function enrich(job: Job): Promise<void> {
     .filter(Boolean).map((h) => htmlToText(String(h)));
   const text = parts.join("\n\n").trim();
   if (text) job.description = truncate(text);
-  job.remote = remoteOf(`${ad.Title ?? ""} ${text}`);
+  // vrsta_zaposlenja_s: „Rad od kuće“ | „Honorarni posao“ | „Stalni radni odnos“… (lista to prikazuje kao „radni odnos“)
+  const vrsta = String(of.vrsta_zaposlenja_s ?? "");
+  job.remote = /rad od ku/i.test(vrsta) || job.remote === "remote" ? "remote" : remoteOf(`${ad.Title ?? ""} ${text}`);
   if (ad.Title) job.title = String(ad.Title).trim();
   if (of.naziv_poslodavca_s) job.company = clean(String(of.naziv_poslodavca_s));
   if (Array.isArray(of.gradovi_ss) && of.gradovi_ss.length) job.location = of.gradovi_ss.join(", ");
   if (ad.AdvertiserLogoUrl) job.companyLogo = String(ad.AdvertiserLogoUrl).replace(/^\/\//, "https://");
   const emp = employmentOf(of.radno_vreme_s);
   if (emp.length) job.employment = emp;
+  if (/honorar/i.test(vrsta) && !job.employment.includes("part-time")) job.employment = [...job.employment.filter((e) => e !== "full-time"), "freelance"];
   job.salary = salaryOf(of) ?? salaryFromDescription(text) ?? undefined;
-  job.tags = [...new Set([...job.tags, of.grupa_zanimanja_s, of.radno_vreme_s].filter(Boolean).map(String))];
+  job.tags = [...new Set([...job.tags, of.grupa_zanimanja_s, of.radno_vreme_s, vrsta].filter(Boolean).map(String))];
 }
 
 export async function search(ctx: SearchCtx): Promise<Job[]> {

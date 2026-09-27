@@ -5,7 +5,8 @@ Lokalna aplikacija koja svakih 15 minuta pročita sajtove za posao, oceni oglase
 i prikaže ih kao kartice na **http://localhost:3003** sa dugmadima ★ Favorit · ✔ Aplicirano · ✕ Odbaci.
 
 Isti model kao scraperi za stanove i QA poslove: TypeScript, Node ≥ 22.6 (type-stripping), **0 npm zavisnosti**, `data/db.json` kao baza,
-dva Windows Scheduled Task-a bez prozora. Zahtev i pravila: [docs/brief.md](docs/brief.md). Provera sajtova: [docs/sources.md](docs/sources.md).
+dva Windows Scheduled Task-a bez prozora. Zahtev i pravila: [docs/brief.md](docs/brief.md). **Spisak svega što se čita: [SOURCE.md](SOURCE.md)**;
+provera sajtova i odbačeni sajtovi: [docs/sources.md](docs/sources.md).
 
 ## Instalacija na drugom računaru (npr. mamin laptop)
 
@@ -33,7 +34,12 @@ Ostalo:
 
 ## Šta se prikazuje
 
-Oglas dobija skor (vidi „Zašto ova ocena“ na kartici) i prikazuje se ako je skor ≥ `minScore` (50) i nije tvrdo odbijen:
+**Tri tvrda uslova** (od 27.09.2026, `rules.json → hardGates` + `language.requireSerbianAd`) — oglas se prikazuje SAMO ako je:
+1. **part-time / honorarno / fleksibilno** (polje sajta ili tekst: „nepuno radno vreme“, „4h ili 6h dnevno“, „20 sati nedeljno“, „honorarno“…; oglas bez ikakve oznake radnog vremena ne prolazi),
+2. **rad od kuće** (polje sajta ili tekst; izuzetak `hybridBelgradePartTime`: hibrid u Beogradu + part-time — `false` = samo čist remote),
+3. **napisan na srpskom/BHS** (ćirilica se latinizuje; engleski oglas ne prolazi ni kad traži „Serbian speaker“).
+
+Posle toga oglas dobija skor (vidi „Zašto ova ocena“ na kartici) i prikazuje se ako je skor ≥ `minScore` (50) i nije tvrdo odbijen:
 
 | Nivo | Skor |
 |------|-----:|
@@ -44,13 +50,17 @@ Oglas dobija skor (vidi „Zašto ova ocena“ na kartici) i prikazuje se ako je
 
 **Tvrdo odbijanje** (nikad se ne prikazuje): **oglas nije napisan na srpskom/BHS** (od 26.09.2026, `language.requireSerbianAd`: broj srpskih reči mora biti ≥ 3 i ≥ broja engleskih; za kratak tekst dovoljna 1 srpska reč; ćirilica se latinizuje); napredni engleski (B2/C1/C2, fluent, advanced, professional, „aktivno znanje engleskog“…) osim kad je „plus/poželjno“;
 strani jezik u naslovu ili obavezan u opisu (nemački, francuski, italijanski…) a srpski se ne traži; lokacija koja isključuje Srbiju (US only, EU citizenship…);
-developer/inženjer/IT, lekar/advokat/računovođa sa licencom, fizički i proizvodni poslovi; oglas bez ijedne ciljane kategorije.
+developer/inženjer/IT, lekar/advokat/računovođa sa licencom, fizički i proizvodni poslovi; oglas osobe koja traži posao („Tražim posao od kuće“).
+Oglas bez ijedne ciljane kategorije više nije tvrdo odbijen (27.09.2026, `categoryRequired: false`) nego dobija −20.
 
 **Glavni bodovi** (sve u `rules.json`): +40 srpski/BHS se traži · +30 oglas na srpskom · +30 part-time / honorarno / fleksibilno · +30 remote · +25 kategorija u naslovu
 (podrška, admin, nekretnine, booking, e-commerce; 20 za unos podataka, porudžbine; manje za telemarketing, AI rating, CAD) · +15 bez iskustva · +15 obuka · +10 osnovni engleski ·
 **full-time = −100000 (sakriven; polje sajta ili „puno radno vreme“/„full-time“ u tekstu)** · **hibrid: prolazi (0) samo u Beogradu i samo ako je part-time, inače −100000** (`employment.hybridCities`) ·
 −80 iz firme · −60 senior/manager/director (osim „asistent direktora“) ·
-−40 nevezana oblast (klinički, logistika, finansije, marketing…) · −50 samo provizija · −40 noćna/US smena · −40 hladni pozivi.
+−40 nevezana oblast (klinički, logistika, finansije, marketing…) · −50 samo provizija · −40 noćna/US smena · −40 hladni pozivi ·
+**−100 MLM / piramida / sumnjiv oglas** (Limes, Farmasi, Avon, forex, video chat 18+, „napiši DA u komentar“…) · −40 samo Telegram / dropshipping ·
+**−80 starosna granica / omladinska zadruga** („Uzrast 18–29“, „do 30 godina“) · −30 „poslovi za mlade“ · −80 volontiranje.
+Kategorija „Anketiranje / istraživanje“ (+25) pokriva telefonske anketare od kuće (Ipsos, Open Source).
 Da se full-time oglasi opet vide kao „Moguć match“, vrati `rules.json → employment.fullTimeScore` na −40 i pokreni `npm run score -- --rescore`.
 
 Čipovi na kartici: plata (zeleno), radno vreme (Part-time / Honorarno / Full-time), Remote / Hibrid / Iz firme, jezik (Srpski / BHS / Osnovni engleski / Oglas na srpskom — žuto),
@@ -58,20 +68,26 @@ kategorije (zeleno), Bez iskustva, Obuka. Traka „novo“ = pronađen posle tvo
 
 ## Izvori
 
+Ceo spisak sa načinom čitanja, filterima i brojem zahteva: **[SOURCE.md](SOURCE.md)**. Ukratko:
+
 | Izvor | Kako | Ritam |
 |-------|------|------:|
-| Poslovi Infostud | `__NEXT_DATA__` JSON, upiti iz `config.json` + svi remote oglasi; detalj za neviđene | 15 min |
-| Startuj Infostud | liste honorarnih poslova i poslova za mlade; isti id kao Infostud | 30 min |
-| Poslovi.rs | AJAX lista cele ponude (~240), sticker RDK = rad od kuće; detalj samo za relevantne | 30 min |
-| Halooglasi (Posao) | `posao-pretraga?u_poslednjih_h=…` cela lista za period (Cloudflare → curl); detalj daje datum, puno/nepuno, platu, grad | 30 min |
-| NSZ (Nacionalna služba za zapošljavanje) | zvanična pretraga `employee/jobs/search` po grupama zanimanja (administracija, trgovina, menadžment…) i ključnim rečima; detalj ima datum objave, mesto, radno vreme, nivo jezika; ćirilica se latinizuje | 30 min |
-| LinkedIn | javni guest API, `location=Serbia`, remote, poslednjih N dana; pauze zbog rate limita; prolaze samo oglasi sa srpskim opisom | 60 min |
-| JobRack, We Work Remotely | ❌ isključeni 26.09.2026: isključivo engleski oglasi, a oglas mora biti na srpskom (`sources.*.enabled`) | – |
-| Himalayas | ❌ isključen 24.09.2026 (`sources.himalayas.enabled: false`): i oglasi sa „Serbian“ u naslovu traže engleski | – |
-| Jooble | ❌ sajt i API endpoint su iza Cloudflare challenge-a (24.09.2026) — adapter postoji, isključen | – |
+| Poslovi Infostud | `__NEXT_DATA__`, 5 „sweep“-ova po filterima sajta (remote × nepuno / honorarno, svi remote, hibrid × nepuno / honorarno) | 15 min |
+| Poslovi.rs | AJAX lista cele ponude (~246), sticker RDK = rad od kuće | 30 min |
+| Halooglasi (Posao) | cela lista za period (Cloudflare → curl); „Rad od kuće“ kao vrsta zaposlenja | 30 min |
+| NSZ | lista od najnovijeg do već viđenih + red za detalje (radno vreme, mesto, jezik) | 30 min |
+| KupujemProdajem (Poslovi) | lista od najnovijeg + detalj (≤ 25 po prolazu zbog anti-bota) | 60 min |
+| Sajtovi firmi (pagewatch) | stalni pozivi za telefonske anketare od kuće: Ipsos, Open Source, Faktor Plus, MASMI | 12 h |
+| KlikDoPosla | javni JSON feed `/ai/jobs.json` | 2 h |
+| Lalafo, OLX.ba | JSON API kategorije poslova (OLX.ba = BiH, BHS) | 2 h / 3 h |
+| Šljaka, OglasZaPosao (Jooble ogledalo) | WordPress RSS / REST pretraga | 6 h |
+| LinkedIn | guest API, `location=Serbia`; remote samo kad tekst kaže | 60 min |
+| Startuj | ❌ isključen 27.09.2026: ista baza kao Infostud | – |
+| JobRack, WWR, Himalayas, Jooble | ❌ isključeni (samo engleski / Cloudflare) | – |
 
 Task se pali na 15 min, a svaki izvor se čita kad mu istekne `everyMin`. „Skeniraj sad“ u UI-ju i `npm run scrape:force` čitaju sve odmah.
-HelloWorld (ista baza kao Infostud), Joberty (SPA, samo IT) i Upwork (Cloudflare) nisu podržani — detalji u [docs/sources.md](docs/sources.md).
+Adapter se učitava tek kad je na redu, pa pokvaren sajt obori samo svoj red u izveštaju. Podešavanja izvora su u `DEFAULTS` na vrhu
+`src/sources/<izvor>.ts` i mogu se pregaziti u `config.json` pod istim imenom (npr. `"kp": { "maxDetails": 20 }`).
 
 ## Duplikati, statusi, novi oglasi
 
@@ -88,6 +104,7 @@ HelloWorld (ista baza kao Infostud), Joberty (SPA, samo IT) i Upwork (Cloudflare
   novi koji sad padnu idu u „Odbačeno“ sa čipom „Sakriveno pravilima“, a takvi se automatski vraćaju u nove kad pravila opet propuste oglas
   (ono što si sam odbacio/favorizovao se ne dira). Oglasi koje je filter odbio još pri skeniranju nisu u bazi — obriši `data/seen.json` da se sve proceni iznova.
 - `npm run score -- <deo naslova>` ispisuje pun obračun za oglas iz baze; `npm run score -- --all` tabelu svih.
+- `npm run try -- <izvor> [--days 30] [--show 20]` — proba jednog izvora bez diranja baze: koliko je palo na kom tvrdom uslovu i koji oglasi prolaze.
 - `config.json` — port, `lookbackDays`, `minScore`, upiti po sajtu, `maxDetails` (koliko detalj-stranica po prolazu), `blockedCompanies`, kursevi `fx`.
 
 ## Komande
@@ -98,6 +115,7 @@ npm run scrape:force   # svi izvori odmah
 npm run scrape -- --only infostud,linkedin
 npm run serve          # UI na :3003
 npm run score -- --all | --rescore | <naslov>
+npm run try -- kp --days 30   # proba izvora bez baze
 ```
 
 Logovi: `data/scraper.log`, `data/new_jobs.log`, `data/filtered.log`, `data/server.out`. Privremena baza za probu: `MOM_JOBS_DATA_DIR=... npm run scrape`.
@@ -114,6 +132,8 @@ src/dedup.ts         ključ firma|naslov + fuzzy (Jaccard) + blokirane firme
 src/salary.ts        parsiranje plate (RSD/EUR/USD, satnica/mesečno/godišnje) i preračun u €/mes
 src/http.ts          fetch + curl fallback (Cloudflare), kolačići, HTML→tekst, RSS, datumi
 src/sources/*.ts     jedan adapter po sajtu — kad sajt promeni HTML, menja se samo taj fajl
+src/try-source.ts    `npm run try -- <izvor>`: proba adaptera + brojanje po tvrdim uslovima, bez baze
+SOURCE.md            spisak svih izvora koji se čitaju i onih koji su provereni i odbačeni
 public/index.html    UI (bez build-a)
 setup.cmd / install.ps1 / uninstall.cmd / update.cmd / run-*.vbs   Windows instalacija
 ```

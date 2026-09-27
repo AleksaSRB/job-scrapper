@@ -6,8 +6,12 @@
  *                  textAdSnippet, jobSummary.summary, primaryCategory.name
  *   detalj: GET https://poslovi.infostud.com/posao/x/y/<id>   (slug nije bitan) -> pageProps.job
  *           textAd (HTML), datePosted "YYYY-MM-DD", employmentType.nameSr, workingHours.nameSr, unformattedSalary{from,to,currency,type}
- * Filteri (id-jevi iz facets-a): workPlaceTypes=remote|hybrid|on-site, workingHours=5 (nepuno) | 7 (puno), employmentTypes=9 (honorarno).
+ * Filteri (id-jevi iz facets-a, provereno 27.09.2026): workPlaceTypes=remote|hybrid|on-site|fieldwork, workingHours=5 (nepuno) | 7 (puno),
+ *           employmentTypes=9 (honorarno) | 8 (ugovor) | 3 (sezonski) | 6 (praksa), languages=j0 (oglas na srpskom) | j1 (engleski) | j2 (ostali); kombinuju se sa AND.
  * `sort` se ignoriše (Premium prvo) -> uz `onlineAfterDate=YYYY-MM-DD` (od baseline-a, max 7 dana) lista je dovoljno mala da stane u maxPages.
+ * 27.09.2026: umesto ~28 upita po ključnoj reči -> nekoliko „sweep“-ova po filterima (config.infostud.sweeps). Tvrdi uslovi traže remote +
+ * part-time, a oglas bez workFromHome/hybridWork je ionako „iz firme“, pa upiti bez remote filtera nisu mogli da daju ništa. Ceo aktivni
+ * Infostud (3235 oglasa) je imao samo 78 remote i 13 remote ∩ (nepuno ∪ honorarno).
  * Startuj i HelloWorld dele istu bazu i iste id-jeve -> id "infostud:<id>" je zajednički.
  */
 import { CONFIG } from "../config.ts";
@@ -86,8 +90,8 @@ export async function fetchDetail(id: number | string, base?: ListJob, source: S
   const text = htmlToText(d.textAd ?? "");
   const job = fromList({ ...(base ?? {}), ...d, workFromHome: base?.workFromHome ?? d.workFromHome, hybridWork: base?.hybridWork ?? d.hybridWork }, source);
   if (!base) {
-    // detalj nema workFromHome flag u istom obliku kao lista -> ostavi tekstu opisa da odluči, osim ako lista nije rekla
-    job.remote = d.workFromHome ? "remote" : d.hybridWork ? "hybrid" : "unknown";
+    // detalj nema workFromHome flag kao lista, ali remote oglas ima location „Rad od kuće“ (regions: ["Srbija"])
+    job.remote = d.workFromHome || /rad od ku/i.test(d.location ?? "") ? "remote" : d.hybridWork ? "hybrid" : "unknown";
   }
   job.employment = employmentOf(d);
   job.salary = salaryOf(d, text);
@@ -100,39 +104,43 @@ export async function fetchDetail(id: number | string, base?: ListJob, source: S
   return job;
 }
 
+
 export async function search(ctx: SearchCtx): Promise<Job[]> {
-  const { maxPages, maxDetails, queries, remoteOnlyQueries } = CONFIG.infostud;
-  const remoteOnly = new Set(remoteOnlyQueries.map((q) => q.toLowerCase()));
+  const { maxPages, maxDetails, sweeps } = CONFIG.infostud;
   const listed = new Map<string, ListJob>();
-  // "" = svi remote oglasi bez upita (ima ih ~90) – hvata i ono što upiti promaše
-  const plan: Array<{ q: string; remote: boolean }> = [{ q: "", remote: true }, ...queries.map((q) => ({ q, remote: remoteOnly.has(q.toLowerCase()) }))];
+  const hint = new Map<string, EmploymentKind[]>(); // radno vreme iz filtera sweep-a (lista ga nema u polju)
   // sort po datumu ne postoji (Premium prvo), pa se lista sužava na oglase postavljene od baseline-a (najviše lookbackDays unazad) -> ne promiču novi ne-Premium oglasi
   const afterMs = Math.max(ctx.since.getTime(), Date.now() - Math.max(7, CONFIG.lookbackDays) * 86_400_000);
   const after = new Date(afterMs);
   const onlineAfter = `${after.getFullYear()}-${String(after.getMonth() + 1).padStart(2, "0")}-${String(after.getDate()).padStart(2, "0")}`;
-  for (const { q, remote } of plan) {
+  for (const sw of sweeps) {
     for (let page = 1; page <= maxPages; page++) {
-      const url = `${BASE}/oglasi-za-posao?${q ? `q=${encodeURIComponent(q)}&` : ""}${remote ? "workPlaceTypes=remote&" : ""}onlineAfterDate=${onlineAfter}&page=${page}`;
+      const url = `${BASE}/oglasi-za-posao?${sw.filters}&onlineAfterDate=${onlineAfter}&page=${page}`;
       const pp = nextData<{ initialSearchResults?: { totalPrimaryItems?: number; jobs?: { primary?: ListJob[] } } }>(await fetchText(url));
       const res = pp?.initialSearchResults;
       const jobs = res?.jobs?.primary ?? [];
-      for (const j of jobs) if (j?.id && !listed.has(jobId(j.id))) listed.set(jobId(j.id), j);
-      ctx.log(`[infostud] q="${q || "(remote)"}" page=${page} results=${jobs.length} total=${res?.totalPrimaryItems ?? "?"}`);
+      for (const j of jobs) {
+        if (!j?.id) continue;
+        const id = jobId(j.id);
+        if (!listed.has(id)) listed.set(id, j);
+        if (sw.employment?.length) hint.set(id, [...new Set([...(hint.get(id) ?? []), ...sw.employment])]);
+      }
+      ctx.log(`[infostud] ${sw.label} page=${page} results=${jobs.length} total=${res?.totalPrimaryItems ?? "?"}`);
       await sleep(400);
       if (jobs.length < 30 || (page * 30) >= (res?.totalPrimaryItems ?? 0)) break;
-      // ne idi dalje ako je cela strana starija od baseline-a (retko, jer sort nije po datumu, ali štedi zahteve)
-      if (jobs.every((j) => { const d = dateSrToIso(j.onlineViewDate); return d !== null && new Date(d) < ctx.since; })) break;
     }
   }
   const out: Job[] = [];
   let details = 0;
   for (const [id, j] of listed) {
     const base = fromList(j);
+    base.employment = hint.get(id) ?? [];
     const fresh = !ctx.isSeen(id) && (base.postedAt === null || new Date(base.postedAt) >= ctx.since);
     if (fresh && details < maxDetails) {
       details++;
       try {
         const full = await fetchDetail(j.id, j);
+        if (full && !full.employment.length) full.employment = base.employment;
         out.push(full ?? base);
       } catch (e) { ctx.log(`[infostud] detalj ${j.id}: ${(e as Error).message}`); out.push(base); }
       await sleep(350);
